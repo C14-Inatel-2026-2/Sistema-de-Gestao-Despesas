@@ -40,9 +40,9 @@ Entre as funcionalidades previstas estão:
 * React
 * JavaScript
 * HTML
-* CSS
+* tailwindCSS
 * Node.js
-* npm
+* pnpm
 
 ### Backend
 
