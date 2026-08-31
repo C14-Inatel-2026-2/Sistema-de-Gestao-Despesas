@@ -1,15 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   EXPENSE_CATEGORIES,
   type ExpenseErrors,
   type ExpenseInput,
 } from "@/types/expense";
 import { isValid, toIsoDate, validateExpense } from "@/lib/expenses";
-
-const inputClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
 
 function emptyForm(): ExpenseInput {
   return {
@@ -27,6 +35,7 @@ interface ExpenseFormProps {
 export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
   const [form, setForm] = useState<ExpenseInput>(emptyForm);
   const [errors, setErrors] = useState<ExpenseErrors>({});
+  const fieldId = useId();
 
   function update(field: keyof ExpenseInput, value: string) {
     setForm((current) => ({ ...current, [field]: value }));
@@ -44,101 +53,106 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
     setForm(emptyForm());
   }
 
+  const ids = {
+    description: `${fieldId}-description`,
+    amount: `${fieldId}-amount`,
+    date: `${fieldId}-date`,
+    category: `${fieldId}-category`,
+  };
+
   return (
-    <form
-      onSubmit={handleSubmit}
-      noValidate
-      className="rounded-xl border border-slate-200 bg-white p-5 shadow-sm dark:border-slate-800 dark:bg-slate-900/60"
-    >
-      <h2 className="text-base font-semibold text-slate-900 dark:text-slate-100">
-        Nova despesa
-      </h2>
+    <Card>
+      <CardHeader>
+        <CardTitle>Nova despesa</CardTitle>
+      </CardHeader>
 
-      <div className="mt-4 grid gap-4 sm:grid-cols-2">
-        <Field
-          label="Descrição"
-          error={errors.description}
-          className="sm:col-span-2"
-        >
-          <input
-            id="description"
-            type="text"
-            value={form.description}
-            onChange={(e) => update("description", e.target.value)}
-            placeholder="Ex.: Supermercado do mês"
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label="Valor (R$)" error={errors.amount}>
-          <input
-            id="amount"
-            type="text"
-            inputMode="decimal"
-            value={form.amount}
-            onChange={(e) => update("amount", e.target.value)}
-            placeholder="0,00"
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label="Data" error={errors.date}>
-          <input
-            id="date"
-            type="date"
-            value={form.date}
-            onChange={(e) => update("date", e.target.value)}
-            className={inputClass}
-          />
-        </Field>
-
-        <Field label="Categoria" error={errors.category} className="sm:col-span-2">
-          <select
-            id="category"
-            value={form.category}
-            onChange={(e) => update("category", e.target.value)}
-            className={inputClass}
+      <CardContent>
+        <form onSubmit={handleSubmit} noValidate className="grid gap-4 sm:grid-cols-2">
+          <Field
+            label="Descrição"
+            htmlFor={ids.description}
+            error={errors.description}
+            className="sm:col-span-2"
           >
-            {EXPENSE_CATEGORIES.map((category) => (
-              <option key={category.id} value={category.id}>
-                {category.label}
-              </option>
-            ))}
-          </select>
-        </Field>
-      </div>
+            <Input
+              id={ids.description}
+              value={form.description}
+              onChange={(e) => update("description", e.target.value)}
+              placeholder="Ex.: Supermercado do mês"
+              aria-invalid={Boolean(errors.description)}
+            />
+          </Field>
 
-      <button
-        type="submit"
-        className="mt-5 w-full rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-medium text-white transition hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:ring-offset-2 dark:focus:ring-offset-slate-900"
-      >
-        Adicionar despesa
-      </button>
-    </form>
+          <Field label="Valor (R$)" htmlFor={ids.amount} error={errors.amount}>
+            <Input
+              id={ids.amount}
+              inputMode="decimal"
+              value={form.amount}
+              onChange={(e) => update("amount", e.target.value)}
+              placeholder="0,00"
+              aria-invalid={Boolean(errors.amount)}
+            />
+          </Field>
+
+          <Field label="Data" htmlFor={ids.date} error={errors.date}>
+            <Input
+              id={ids.date}
+              type="date"
+              value={form.date}
+              onChange={(e) => update("date", e.target.value)}
+              aria-invalid={Boolean(errors.date)}
+            />
+          </Field>
+
+          <Field
+            label="Categoria"
+            htmlFor={ids.category}
+            error={errors.category}
+            className="sm:col-span-2"
+          >
+            <Select
+              value={form.category}
+              onValueChange={(value) => update("category", value)}
+            >
+              <SelectTrigger id={ids.category} className="w-full">
+                <SelectValue placeholder="Selecione uma categoria" />
+              </SelectTrigger>
+              <SelectContent>
+                {EXPENSE_CATEGORIES.map((category) => (
+                  <SelectItem key={category.id} value={category.id}>
+                    {category.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
+
+          <Button type="submit" size="lg" className="mt-1 w-full sm:col-span-2">
+            Adicionar despesa
+          </Button>
+        </form>
+      </CardContent>
+    </Card>
   );
 }
 
 interface FieldProps {
   label: string;
+  htmlFor: string;
   error?: string;
   className?: string;
-  children: React.ReactElement<{ id?: string }>;
+  children: React.ReactNode;
 }
 
-function Field({ label, error, className = "", children }: FieldProps) {
-  const id = children.props.id;
-
+function Field({ label, htmlFor, error, className, children }: FieldProps) {
   return (
     <div className={className}>
-      <label
-        htmlFor={id}
-        className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
-      >
+      <Label htmlFor={htmlFor} className="mb-2">
         {label}
-      </label>
+      </Label>
       {children}
       {error ? (
-        <p role="alert" className="mt-1.5 text-xs text-red-600 dark:text-red-400">
+        <p role="alert" className="mt-1.5 text-xs text-destructive">
           {error}
         </p>
       ) : null}

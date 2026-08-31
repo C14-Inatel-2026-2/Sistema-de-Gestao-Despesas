@@ -26,7 +26,10 @@ describe("<ExpenseForm />", () => {
     const description = screen.getByLabelText(/descrição/i);
     await user.type(description, "Passagem de ônibus");
     await user.type(screen.getByLabelText(/valor/i), "12,50");
-    await user.selectOptions(screen.getByLabelText(/categoria/i), "transporte");
+    // O Select do shadcn/ui e um combobox do Radix, nao um <select> nativo:
+    // abre o menu e escolhe a opcao pelo texto.
+    await user.click(screen.getByRole("combobox", { name: /categoria/i }));
+    await user.click(await screen.findByRole("option", { name: "Transporte" }));
 
     await user.click(screen.getByRole("button", { name: /adicionar despesa/i }));
 

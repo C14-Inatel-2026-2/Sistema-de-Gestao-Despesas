@@ -1,9 +1,17 @@
 "use client";
 
+import { useId } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { EXPENSE_CATEGORIES, type ExpenseFilters } from "@/types/expense";
-
-const controlClass =
-  "w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-900 outline-none transition focus:border-emerald-500 focus:ring-2 focus:ring-emerald-500/20 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-100";
 
 interface ExpenseFiltersBarProps {
   filters: ExpenseFilters;
@@ -11,75 +19,71 @@ interface ExpenseFiltersBarProps {
 }
 
 export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps) {
+  const fieldId = useId();
   const hasFilters =
     filters.category !== "todas" || filters.from !== "" || filters.to !== "";
 
   return (
     <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
       <div>
-        <label
-          htmlFor="filter-category"
-          className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
-        >
+        <Label htmlFor={`${fieldId}-category`} className="mb-2">
           Categoria
-        </label>
-        <select
-          id="filter-category"
+        </Label>
+        <Select
           value={filters.category}
-          onChange={(e) =>
-            onChange({ ...filters, category: e.target.value as ExpenseFilters["category"] })
+          onValueChange={(value) =>
+            onChange({ ...filters, category: value as ExpenseFilters["category"] })
           }
-          className={controlClass}
         >
-          <option value="todas">Todas</option>
-          {EXPENSE_CATEGORIES.map((category) => (
-            <option key={category.id} value={category.id}>
-              {category.label}
-            </option>
-          ))}
-        </select>
+          <SelectTrigger id={`${fieldId}-category`} className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="todas">Todas</SelectItem>
+            {EXPENSE_CATEGORIES.map((category) => (
+              <SelectItem key={category.id} value={category.id}>
+                {category.label}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
 
       <div>
-        <label
-          htmlFor="filter-from"
-          className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
-        >
+        <Label htmlFor={`${fieldId}-from`} className="mb-2">
           De
-        </label>
-        <input
-          id="filter-from"
+        </Label>
+        <Input
+          id={`${fieldId}-from`}
           type="date"
           value={filters.from}
+          max={filters.to || undefined}
           onChange={(e) => onChange({ ...filters, from: e.target.value })}
-          className={controlClass}
         />
       </div>
 
       <div>
-        <label
-          htmlFor="filter-to"
-          className="mb-1.5 block text-xs font-medium text-slate-600 dark:text-slate-400"
-        >
+        <Label htmlFor={`${fieldId}-to`} className="mb-2">
           Até
-        </label>
-        <input
-          id="filter-to"
+        </Label>
+        <Input
+          id={`${fieldId}-to`}
           type="date"
           value={filters.to}
+          min={filters.from || undefined}
           onChange={(e) => onChange({ ...filters, to: e.target.value })}
-          className={controlClass}
         />
       </div>
 
-      <button
+      <Button
         type="button"
+        variant="outline"
+        size="lg"
         disabled={!hasFilters}
         onClick={() => onChange({ category: "todas", from: "", to: "" })}
-        className="rounded-lg border border-slate-300 px-4 py-2 text-sm font-medium text-slate-700 transition hover:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-40 dark:border-slate-700 dark:text-slate-300 dark:hover:bg-slate-800"
       >
         Limpar
-      </button>
+      </Button>
     </div>
   );
 }
