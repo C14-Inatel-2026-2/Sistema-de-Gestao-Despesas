@@ -1,10 +1,10 @@
-# 💰 Sistema de Gestão de Despesas
+# Sistema de Gestão de Despesas
 
-Sistema desenvolvido com o objetivo de facilitar o **controle e gerenciamento de despesas pessoais**, permitindo o cadastro, acompanhamento e organização de gastos de forma simples e intuitiva.
+Aplicação web para controle de despesas pessoais: cadastro, categorização, filtros por período e acompanhamento dos gastos.
 
-O projeto será desenvolvido utilizando **Next.js/React no frontend**, **Python no backend** e **Node.js no ambiente de desenvolvimento e gerenciamento das dependências do frontend**.
+Frontend em Next.js hospedado na Vercel, backend em Python com API REST.
 
-## 👥 Integrantes
+## Integrantes
 
 | Integrante                    | Responsabilidades      |
 | ----------------------------- | ---------------------- |
@@ -14,32 +14,29 @@ O projeto será desenvolvido utilizando **Next.js/React no frontend**, **Python 
 | **André Dias Balbino**        | Frontend, Backend e QA |
 | **João Victor Siécola Souza** | Frontend, Backend e QA |
 
+## Objetivo
 
-## 🚀 Objetivo do Projeto
+Permitir que o usuário registre seus gastos e visualize suas informações financeiras de forma organizada.
 
-Desenvolver uma aplicação web para gerenciamento de despesas, permitindo que o usuário tenha maior controle sobre seus gastos e consiga visualizar suas informações financeiras de maneira organizada.
+Funcionalidades previstas:
 
-Entre as funcionalidades previstas estão:
-
-* Cadastro de despesas;
-* Edição de despesas;
-* Exclusão de despesas;
-* Listagem de despesas;
+* Cadastro, edição, exclusão e listagem de despesas;
 * Categorização de gastos;
 * Filtros por período e categoria;
 * Visualização do total de despesas;
-* Dashboard para acompanhamento dos gastos;
-* Interface responsiva e de fácil utilização.
+* Dashboard para acompanhamento;
+* Interface responsiva.
 
 ---
 
-## 🛠️ Tecnologias
+## Tecnologias
 
 ### Frontend
 
+* Next.js
 * React
 * TypeScript
-* tailwind
+* Tailwind CSS
 * shadcn/ui
 * Node.js
 * pnpm
@@ -51,52 +48,47 @@ Entre as funcionalidades previstas estão:
 * SQLAlchemy
 * Alembic
 * PostgreSQL
-* API REST
 * Swagger / OpenAPI
 * pytest
 * Ruff
 
 ### DevOps
 
-* Git
-* GitHub
+* Git e GitHub
 * Jenkins
-* CI/CD
-* Docker
-* Docker Compose
+* Docker e Docker Compose
 * Vercel
 
 ---
 
-## 🏗️ Arquitetura
+## Arquitetura
 
-O sistema é dividido em duas aplicações independentes que conversam por **HTTP/JSON**.
-O frontend não acessa o banco de dados diretamente: tudo passa pela API.
+O sistema é dividido em duas aplicações independentes que conversam por HTTP/JSON. O frontend não acessa o banco diretamente: tudo passa pela API.
 
 ```mermaid
 flowchart LR
-    user["👤 Usuário<br/>navegador"]
+    user["Usuário<br/>navegador"]
 
     subgraph vercel["Vercel"]
-        front["Frontend<br/>Next.js + React + TypeScript"]
+        front["Frontend<br/>Next.js + TypeScript"]
     end
 
     subgraph infra["Servidor / Container"]
-        api["Backend<br/>API REST em Python"]
+        api["Backend<br/>FastAPI"]
         docs["Swagger UI<br/>/docs"]
-        db[("Banco de dados")]
+        db[("PostgreSQL")]
     end
 
     user -->|HTTPS| front
     front -->|"JSON via NEXT_PUBLIC_API_URL"| api
-    api -->|consultas| db
+    api -->|SQLAlchemy| db
     api -.->|gera automaticamente| docs
     docs -.->|contrato da API| front
 ```
 
-### Como as partes se comunicam
+### Fluxo de uma requisição
 
-Exemplo do cadastro de uma despesa, do clique até a tela atualizada:
+Cadastro de uma despesa, do clique até a tela atualizada:
 
 ```mermaid
 sequenceDiagram
@@ -115,38 +107,32 @@ sequenceDiagram
     F-->>U: Atualiza a lista e o total
 ```
 
-A validação acontece **dos dois lados**: no frontend para dar retorno imediato ao
-usuário, e no backend porque a API pode ser chamada por qualquer cliente.
+A validação acontece dos dois lados: no frontend para dar retorno imediato ao usuário, e no backend porque a API pode ser chamada por qualquer cliente.
 
 ---
 
-## 📖 API e Documentação (Swagger)
+## API e documentação
 
-A API é documentada com **Swagger / OpenAPI**. A documentação é gerada a partir do
-próprio código, então ela nunca fica desatualizada em relação aos endpoints reais.
+O FastAPI gera a documentação a partir do próprio código, então ela não desatualiza em relação aos endpoints reais. Quem trabalha no frontend consulta o `/docs` para saber o formato de cada requisição, sem precisar ler o código do backend.
 
-| Rota            | Para que serve                                     |
-| --------------- | -------------------------------------------------- |
-| `/docs`         | Swagger UI — permite testar os endpoints pelo navegador |
-| `/redoc`        | Mesma documentação em formato de leitura            |
-| `/openapi.json` | Contrato da API em JSON                             |
-
-Isso desacopla o time: quem trabalha no frontend consulta o `/docs` para saber o
-formato de cada requisição, sem precisar ler o código do backend.
+| Rota            | Para que serve                                   |
+| --------------- | ------------------------------------------------ |
+| `/docs`         | Swagger UI, permite testar os endpoints no navegador |
+| `/openapi.json` | Contrato da API em JSON                          |
 
 Endpoints previstos:
 
-| Método   | Rota              | Descrição                    |
-| -------- | ----------------- | ---------------------------- |
-| `GET`    | `/despesas`       | Lista as despesas            |
-| `POST`   | `/despesas`       | Cadastra uma despesa         |
-| `PUT`    | `/despesas/{id}`  | Edita uma despesa            |
-| `DELETE` | `/despesas/{id}`  | Exclui uma despesa           |
-| `GET`    | `/categorias`     | Lista as categorias          |
+| Método   | Rota             | Descrição            |
+| -------- | ---------------- | -------------------- |
+| `GET`    | `/despesas`      | Lista as despesas    |
+| `POST`   | `/despesas`      | Cadastra uma despesa |
+| `PUT`    | `/despesas/{id}` | Edita uma despesa    |
+| `DELETE` | `/despesas/{id}` | Exclui uma despesa   |
+| `GET`    | `/categorias`    | Lista as categorias  |
 
 ---
 
-## 📁 Estrutura Inicial do Projeto
+## Estrutura do projeto
 
 ```text
 Sistema-de-Gestao-Despesas/
@@ -159,50 +145,43 @@ Sistema-de-Gestao-Despesas/
 │   │   ├── lib/         # Regras de negócio + testes
 │   │   └── types/       # Tipos do domínio
 │   ├── public/
+│   ├── Dockerfile
 │   └── package.json
 │
 ├── backend/
 │   ├── src/
 │   ├── tests/
+│   ├── alembic/         # Migrações do banco
 │   └── requirements.txt
 │
-├── .github/
-│   └── workflows/
-│
+├── docker-compose.yml
+├── Jenkinsfile
 ├── .gitignore
 └── README.md
 ```
 
-A estrutura poderá ser alterada durante o desenvolvimento conforme as necessidades do projeto.
-
 ---
 
-## 🧪 Testes
+## Testes
 
-O projeto será desenvolvido de forma que suas principais funcionalidades possam ser testadas futuramente.
+| Camada              | Ferramenta               | O que cobre                          |
+| ------------------- | ------------------------ | ------------------------------------ |
+| Unitário (frontend) | Vitest + Testing Library | Regras de negócio e componentes      |
+| Unitário (backend)  | pytest                   | Validações e regras da API           |
+| Integração (API)    | pytest + `TestClient`    | Endpoints reais, requisição/resposta |
+| Ponta a ponta       | Playwright               | Fluxos completos no navegador        |
+| Exploratório        | Postman                  | Testes manuais e demonstração        |
 
-Inicialmente serão criadas pequenas funcionalidades independentes, permitindo a implementação de testes unitários e de integração durante a evolução do projeto.
+O `TestClient` do FastAPI usa httpx por baixo, então os testes de integração batem nos endpoints de verdade sem precisar subir um servidor. A collection do Postman deve ser importada do `/openapi.json`, para não ser mantida à mão quando a API mudar.
 
-As camadas de teste, do mais rápido ao mais lento:
-
-| Camada           | Ferramenta              | O que cobre                                 |
-| ---------------- | ----------------------- | ------------------------------------------- |
-| Unitário (front) | Vitest                  | Regras de negócio e componentes isolados     |
-| Unitário (back)  | pytest                  | Validações e regras da API                   |
-| Ponta a ponta    | Playwright              | Fluxos reais no navegador, com a stack no ar |
-| Exploratório     | Postman                 | Testes manuais e demonstração da API         |
-
-A collection do Postman deve ser importada a partir do `/openapi.json` do
-FastAPI, para não precisar ser mantida à mão quando a API mudar.
-
-No frontend:
+Rodando os testes do frontend:
 
 ```bash
 cd frontend
 pnpm test
 ```
 
-Funcionalidades já cobertas por testes:
+Funcionalidades já cobertas:
 
 * Validação de valores de despesas;
 * Cadastro de despesas (unitário e de componente);
@@ -212,16 +191,15 @@ Funcionalidades já cobertas por testes:
 
 ---
 
-## 🔄 Pipeline de CI/CD
+## Pipeline de CI/CD
 
-Nenhuma alteração entra na `main` sem passar pelos testes automatizados e pela
-revisão de outro integrante.
+Nenhuma alteração entra na `main` sem passar pelos testes automatizados e pela revisão de outro integrante.
 
 ```mermaid
 flowchart TD
     A["Desenvolvedor<br/>feature/minha-feature"] --> B["Push para o GitHub"]
     B --> C["Abre Pull Request para a main"]
-    C --> D["Jenkins<br/>acionado por webhook"]
+    C --> D["Jenkins"]
     D --> E["Frontend<br/>lint + type-check + Vitest"]
     D --> F["Backend<br/>Ruff + pytest"]
     D --> M["E2E<br/>Playwright sobre o Docker Compose"]
@@ -238,30 +216,14 @@ flowchart TD
 
 ---
 
-## 📦 Gerenciamento de Dependências
+## Dependências
 
-O projeto utilizará arquivos específicos para gerenciamento das dependências.
+| Parte    | Arquivo                            | Observação                                        |
+| -------- | ---------------------------------- | ------------------------------------------------- |
+| Frontend | `package.json`, `pnpm-lock.yaml`   | Use sempre `pnpm`; o lockfile é dele              |
+| Backend  | `requirements.txt`                 | Instalado com `pip install -r requirements.txt`   |
 
-### Frontend
-
-```text
-package.json
-```
-
-Responsável pelo gerenciamento das dependências do Next.js e Node.js.
-O `pnpm-lock.yaml` fixa as versões — use sempre `pnpm`, nunca `npm` ou `yarn`.
-
-### Backend
-
-```text
-requirements.txt
-```
-
-Responsável pelas dependências Python utilizadas pela API.
-
-As mudanças no banco são versionadas com **Alembic**: toda alteração de tabela
-vira um arquivo de migração commitado junto com o código. Assim os integrantes
-atualizam o banco local com um comando, sem recriar nada à mão:
+As mudanças no banco são versionadas com Alembic: toda alteração de tabela vira um arquivo de migração commitado junto com o código, e os integrantes atualizam o banco local com um comando.
 
 ```bash
 alembic upgrade head
@@ -269,68 +231,26 @@ alembic upgrade head
 
 ---
 
-## 🌿 Organização do Git
+## Fluxo de trabalho
 
-Cada integrante deverá trabalhar utilizando sua própria branch.
-
-Exemplo:
+Cada integrante trabalha na própria branch e envia as alterações por Pull Request, que precisa ser aprovado por **outro integrante** antes do merge na `main`. Cada integrante deve fazer no mínimo um commit no projeto.
 
 ```bash
 git checkout -b feature/nome-da-feature
 ```
 
-Os commits deverão seguir boas práticas de escrita.
-
-Exemplos:
+Os commits seguem o padrão Conventional Commits:
 
 ```bash
 git commit -m "feat: adiciona cadastro de despesas"
-```
-
-```bash
-git commit -m "feat: cria estrutura inicial do frontend"
-```
-
-```bash
-git commit -m "feat: adiciona API de despesas"
-```
-
-```bash
-git commit -m "ci: adiciona pipeline de integração contínua"
-```
-
-```bash
-git commit -m "docs: atualiza documentação do projeto"
+git commit -m "fix: corrige cálculo do total"
+git commit -m "ci: adiciona pipeline do Jenkins"
+git commit -m "docs: atualiza documentação"
 ```
 
 ---
 
-## 🔀 Pull Requests
-
-Cada integrante deverá realizar **no mínimo um commit** no projeto.
-
-As alterações deverão ser enviadas através de uma branch e posteriormente abertas como **Pull Request**.
-
-O Pull Request deverá ser revisado e aprovado por **outro integrante do grupo** antes de ser integrado à branch `main`.
-
-Fluxo esperado:
-
-```mermaid
-flowchart LR
-    A["Branch do<br/>desenvolvedor"] --> B["Commit"]
-    B --> C["Push"]
-    C --> D["Pull Request"]
-    D --> E["Revisão de<br/>outro membro"]
-    E --> F["Aprovação"]
-    F --> G["Merge"]
-    G --> H["main"]
-```
-
----
-
-## ✅ Requisitos da Entrega Inicial
-
-Para esta primeira etapa do projeto deverão ser atendidos os seguintes requisitos:
+## Requisitos da Entrega Inicial
 
 * [x] Definição do projeto;
 * [x] Definição das tecnologias;
@@ -347,8 +267,6 @@ Para esta primeira etapa do projeto deverão ser atendidos os seguintes requisit
 
 ---
 
-## 📌 Status do Projeto
+## Status
 
-🚧 **Em desenvolvimento**
-
-Primeira etapa focada na definição da arquitetura, organização do repositório, criação das primeiras funcionalidades e configuração do fluxo de desenvolvimento utilizando Git, Pull Requests e CI/CD.
+Em desenvolvimento. Primeira etapa focada na definição da arquitetura, organização do repositório, primeiras funcionalidades testáveis e configuração do fluxo de Git, Pull Requests e CI/CD.
