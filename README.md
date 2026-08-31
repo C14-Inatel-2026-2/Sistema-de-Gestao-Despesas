@@ -8,7 +8,7 @@ Frontend em Next.js hospedado na Vercel, backend em Python com API REST.
 
 | Integrante                    | Responsabilidades      |
 | ----------------------------- | ---------------------- |
-| **Marco Renzo**               | UI/UX, Backend e QA    |
+| **Marco Di Toro**               | UI/UX, Backend e QA    |
 | **Gabriel Texeira**           | Frontend e QA          |
 | **Paulo Vicente**             | DevOps, CI/CD e QA     |
 | **André Dias Balbino**        | Frontend, Backend e QA |
