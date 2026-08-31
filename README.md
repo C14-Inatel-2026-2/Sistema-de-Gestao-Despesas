@@ -40,6 +40,7 @@ Entre as funcionalidades previstas estão:
 * React
 * TypeScript
 * tailwind
+* shadcn/ui
 * Node.js
 * pnpm
 
@@ -47,6 +48,7 @@ Entre as funcionalidades previstas estão:
 
 * Python
 * API REST
+* Swagger / OpenAPI
 
 ### DevOps
 
@@ -54,6 +56,85 @@ Entre as funcionalidades previstas estão:
 * GitHub
 * CI/CD
 * Docker
+* Vercel
+
+---
+
+## 🏗️ Arquitetura
+
+O sistema é dividido em duas aplicações independentes que conversam por **HTTP/JSON**.
+O frontend não acessa o banco de dados diretamente: tudo passa pela API.
+
+```mermaid
+flowchart LR
+    user["👤 Usuário<br/>navegador"]
+
+    subgraph vercel["Vercel"]
+        front["Frontend<br/>Next.js + React + TypeScript"]
+    end
+
+    subgraph infra["Servidor / Container"]
+        api["Backend<br/>API REST em Python"]
+        docs["Swagger UI<br/>/docs"]
+        db[("Banco de dados")]
+    end
+
+    user -->|HTTPS| front
+    front -->|"JSON via NEXT_PUBLIC_API_URL"| api
+    api -->|consultas| db
+    api -.->|gera automaticamente| docs
+    docs -.->|contrato da API| front
+```
+
+### Como as partes se comunicam
+
+Exemplo do cadastro de uma despesa, do clique até a tela atualizada:
+
+```mermaid
+sequenceDiagram
+    actor U as Usuário
+    participant F as Frontend
+    participant A as API
+    participant D as Banco
+
+    U->>F: Preenche o formulário
+    F->>F: Valida os dados no cliente
+    F->>A: POST /despesas
+    A->>A: Valida os dados no servidor
+    A->>D: Grava a despesa
+    D-->>A: Despesa criada
+    A-->>F: 201 Created + JSON
+    F-->>U: Atualiza a lista e o total
+```
+
+A validação acontece **dos dois lados**: no frontend para dar retorno imediato ao
+usuário, e no backend porque a API pode ser chamada por qualquer cliente.
+
+---
+
+## 📖 API e Documentação (Swagger)
+
+A API é documentada com **Swagger / OpenAPI**. A documentação é gerada a partir do
+próprio código, então ela nunca fica desatualizada em relação aos endpoints reais.
+
+| Rota            | Para que serve                                     |
+| --------------- | -------------------------------------------------- |
+| `/docs`         | Swagger UI — permite testar os endpoints pelo navegador |
+| `/redoc`        | Mesma documentação em formato de leitura            |
+| `/openapi.json` | Contrato da API em JSON                             |
+
+Isso desacopla o time: quem trabalha no frontend consulta o `/docs` para saber o
+formato de cada requisição, sem precisar ler o código do backend.
+
+Endpoints previstos:
+
+| Método   | Rota              | Descrição                    |
+| -------- | ----------------- | ---------------------------- |
+| `GET`    | `/despesas`       | Lista as despesas            |
+| `POST`   | `/despesas`       | Cadastra uma despesa         |
+| `PUT`    | `/despesas/{id}`  | Edita uma despesa            |
+| `DELETE` | `/despesas/{id}`  | Exclui uma despesa           |
+| `GET`    | `/categorias`     | Lista as categorias          |
 
 ---
 
@@ -108,6 +189,30 @@ Funcionalidades já cobertas por testes:
 * Cálculo do total de despesas;
 * Filtro de despesas por categoria e por período;
 * Agrupamento de gastos por categoria.
+
+---
+
+## 🔄 Pipeline de CI/CD
+
+Nenhuma alteração entra na `main` sem passar pelos testes automatizados e pela
+revisão de outro integrante.
+
+```mermaid
+flowchart TD
+    A["Desenvolvedor<br/>feature/minha-feature"] --> B["Push para o GitHub"]
+    B --> C["Abre Pull Request para a main"]
+    C --> D["GitHub Actions"]
+    D --> E["Frontend<br/>lint + type-check + testes"]
+    D --> F["Backend<br/>pytest"]
+    E --> G{"Tudo verde?"}
+    F --> G
+    G -->|"Não"| H["Corrigir e enviar novo commit"]
+    H --> B
+    G -->|Sim| I["Revisão de outro integrante"]
+    I -->|Aprovado| J["Merge na main"]
+    J --> K["Deploy do frontend<br/>Vercel"]
+    J --> L["Deploy do backend<br/>imagem Docker"]
+```
 
 ---
 
@@ -180,22 +285,15 @@ O Pull Request deverá ser revisado e aprovado por **outro integrante do grupo**
 
 Fluxo esperado:
 
-```text
-Branch do desenvolvedor
-        ↓
-      Commit
-        ↓
-      Push
-        ↓
-   Pull Request
-        ↓
-Revisão de outro membro
-        ↓
-     Aprovação
-        ↓
-      Merge
-        ↓
-       main
+```mermaid
+flowchart LR
+    A["Branch do<br/>desenvolvedor"] --> B["Commit"]
+    B --> C["Push"]
+    C --> D["Pull Request"]
+    D --> E["Revisão de<br/>outro membro"]
+    E --> F["Aprovação"]
+    F --> G["Merge"]
+    G --> H["main"]
 ```
 
 ---
