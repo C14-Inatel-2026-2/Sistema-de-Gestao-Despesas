@@ -49,8 +49,14 @@ Funcionalidades previstas:
 * Alembic
 * PostgreSQL
 * Swagger / OpenAPI
-* pytest
 * Ruff
+
+### Testes
+
+* Vitest
+* pytest
+* Playwright
+* Postman
 
 ### DevOps
 
