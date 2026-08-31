@@ -47,15 +47,23 @@ Entre as funcionalidades previstas estão:
 ### Backend
 
 * Python
+* FastAPI
+* SQLAlchemy
+* Alembic
+* PostgreSQL
 * API REST
 * Swagger / OpenAPI
+* pytest
+* Ruff
 
 ### DevOps
 
 * Git
 * GitHub
+* Jenkins
 * CI/CD
 * Docker
+* Docker Compose
 * Vercel
 
 ---
@@ -175,7 +183,19 @@ O projeto será desenvolvido de forma que suas principais funcionalidades possam
 
 Inicialmente serão criadas pequenas funcionalidades independentes, permitindo a implementação de testes unitários e de integração durante a evolução do projeto.
 
-No frontend os testes rodam com **Vitest** e **Testing Library**:
+As camadas de teste, do mais rápido ao mais lento:
+
+| Camada           | Ferramenta              | O que cobre                                 |
+| ---------------- | ----------------------- | ------------------------------------------- |
+| Unitário (front) | Vitest                  | Regras de negócio e componentes isolados     |
+| Unitário (back)  | pytest                  | Validações e regras da API                   |
+| Ponta a ponta    | Playwright              | Fluxos reais no navegador, com a stack no ar |
+| Exploratório     | Postman                 | Testes manuais e demonstração da API         |
+
+A collection do Postman deve ser importada a partir do `/openapi.json` do
+FastAPI, para não precisar ser mantida à mão quando a API mudar.
+
+No frontend:
 
 ```bash
 cd frontend
@@ -201,15 +221,17 @@ revisão de outro integrante.
 flowchart TD
     A["Desenvolvedor<br/>feature/minha-feature"] --> B["Push para o GitHub"]
     B --> C["Abre Pull Request para a main"]
-    C --> D["GitHub Actions"]
-    D --> E["Frontend<br/>lint + type-check + testes"]
-    D --> F["Backend<br/>pytest"]
+    C --> D["Jenkins<br/>acionado por webhook"]
+    D --> E["Frontend<br/>lint + type-check + Vitest"]
+    D --> F["Backend<br/>Ruff + pytest"]
+    D --> M["E2E<br/>Playwright sobre o Docker Compose"]
     E --> G{"Tudo verde?"}
     F --> G
+    M --> G
     G -->|"Não"| H["Corrigir e enviar novo commit"]
     H --> B
-    G -->|Sim| I["Revisão de outro integrante"]
-    I -->|Aprovado| J["Merge na main"]
+    G -->|"Sim"| I["Revisão de outro integrante"]
+    I -->|"Aprovado"| J["Merge na main"]
     J --> K["Deploy do frontend<br/>Vercel"]
     J --> L["Deploy do backend<br/>imagem Docker"]
 ```
@@ -236,6 +258,14 @@ requirements.txt
 ```
 
 Responsável pelas dependências Python utilizadas pela API.
+
+As mudanças no banco são versionadas com **Alembic**: toda alteração de tabela
+vira um arquivo de migração commitado junto com o código. Assim os integrantes
+atualizam o banco local com um comando, sem recriar nada à mão:
+
+```bash
+alembic upgrade head
+```
 
 ---
 
