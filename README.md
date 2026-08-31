@@ -2,7 +2,7 @@
 
 Sistema desenvolvido com o objetivo de facilitar o **controle e gerenciamento de despesas pessoais**, permitindo o cadastro, acompanhamento e organização de gastos de forma simples e intuitiva.
 
-O projeto será desenvolvido utilizando **React no frontend**, **Python no backend** e **Node.js no ambiente de desenvolvimento e gerenciamento das dependências do frontend**.
+O projeto será desenvolvido utilizando **Next.js/React no frontend**, **Python no backend** e **Node.js no ambiente de desenvolvimento e gerenciamento das dependências do frontend**.
 
 ## 👥 Integrantes
 
@@ -38,9 +38,8 @@ Entre as funcionalidades previstas estão:
 ### Frontend
 
 * React
-* JavaScript
-* HTML
-* tailwindCSS
+* TypeScript
+* tailwind
 * Node.js
 * pnpm
 
@@ -53,7 +52,6 @@ Entre as funcionalidades previstas estão:
 
 * Git
 * GitHub
-* GitHub Actions
 * CI/CD
 * Docker
 
@@ -66,6 +64,11 @@ Sistema-de-Gestao-Despesas/
 │
 ├── frontend/
 │   ├── src/
+│   │   ├── app/         # Rotas (App Router)
+│   │   ├── components/  # Componentes de UI
+│   │   ├── hooks/       # Estado compartilhado
+│   │   ├── lib/         # Regras de negócio + testes
+│   │   └── types/       # Tipos do domínio
 │   ├── public/
 │   └── package.json
 │
@@ -91,13 +94,20 @@ O projeto será desenvolvido de forma que suas principais funcionalidades possam
 
 Inicialmente serão criadas pequenas funcionalidades independentes, permitindo a implementação de testes unitários e de integração durante a evolução do projeto.
 
-Exemplos de funcionalidades testáveis:
+No frontend os testes rodam com **Vitest** e **Testing Library**:
+
+```bash
+cd frontend
+pnpm test
+```
+
+Funcionalidades já cobertas por testes:
 
 * Validação de valores de despesas;
-* Cadastro de despesas;
+* Cadastro de despesas (unitário e de componente);
 * Cálculo do total de despesas;
-* Filtro de despesas por categoria;
-* Validação de dados enviados para a API.
+* Filtro de despesas por categoria e por período;
+* Agrupamento de gastos por categoria.
 
 ---
 
@@ -111,7 +121,8 @@ O projeto utilizará arquivos específicos para gerenciamento das dependências.
 package.json
 ```
 
-Responsável pelo gerenciamento das dependências React e Node.js.
+Responsável pelo gerenciamento das dependências do Next.js e Node.js.
+O `pnpm-lock.yaml` fixa as versões — use sempre `pnpm`, nunca `npm` ou `yarn`.
 
 ### Backend
 
@@ -197,10 +208,10 @@ Para esta primeira etapa do projeto deverão ser atendidos os seguintes requisit
 * [x] Definição das tecnologias;
 * [x] Definição inicial da arquitetura;
 * [x] Definição das responsabilidades dos integrantes;
-* [ ] Criar estrutura inicial de pastas;
-* [ ] Desenvolver pelo menos uma pequena funcionalidade testável;
+* [x] Criar estrutura inicial de pastas;
+* [x] Desenvolver pelo menos uma pequena funcionalidade testável;
 * [ ] Criar `requirements.txt`;
-* [ ] Criar `package.json`;
+* [x] Criar `package.json`;
 * [ ] Cada integrante realizar pelo menos 1 commit;
 * [ ] Cada alteração ser enviada através de Pull Request;
 * [ ] Pull Requests serem aprovados por outro integrante;
