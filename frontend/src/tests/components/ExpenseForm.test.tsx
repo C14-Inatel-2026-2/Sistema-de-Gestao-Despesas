@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { describe, expect, it, vi } from "vitest";
-import { ExpenseForm } from "./ExpenseForm";
+import { ExpenseForm } from "@/components/ExpenseForm";
 import { toIsoDate } from "@/lib/expenses";
 
 describe("<ExpenseForm />", () => {

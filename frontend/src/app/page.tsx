@@ -45,7 +45,11 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <ExpenseList expenses={visible} onDelete={removeExpense} />
+          <ExpenseList
+            expenses={visible}
+            totalCount={expenses.length}
+            onDelete={removeExpense}
+          />
         </section>
       </div>
     </main>

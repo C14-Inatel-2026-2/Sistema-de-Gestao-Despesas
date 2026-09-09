@@ -1,35 +1,11 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import { isExpenseCategory, type Expense, type ExpenseInput } from "@/types/expense";
+import { MOCK_EXPENSES, resolveExpenses, STORAGE_KEY } from "@/data/mock";
 import { createExpense, sortByDateDesc } from "@/lib/expenses";
+import type { Expense, ExpenseInput } from "@/types/expense";
 
-const STORAGE_KEY = "gestao-despesas:expenses";
 const EMPTY: Expense[] = [];
-
-/** Descarta qualquer coisa no localStorage que não tenha o formato de despesa. */
-function parseStored(raw: string): Expense[] {
-  let parsed: unknown;
-  try {
-    parsed = JSON.parse(raw);
-  } catch {
-    return EMPTY;
-  }
-  if (!Array.isArray(parsed)) return EMPTY;
-
-  return parsed.filter((item): item is Expense => {
-    if (typeof item !== "object" || item === null) return false;
-    const candidate = item as Record<string, unknown>;
-    return (
-      typeof candidate.id === "string" &&
-      typeof candidate.description === "string" &&
-      typeof candidate.amount === "number" &&
-      typeof candidate.date === "string" &&
-      typeof candidate.category === "string" &&
-      isExpenseCategory(candidate.category)
-    );
-  });
-}
 
 const listeners = new Set<() => void>();
 
@@ -39,6 +15,7 @@ const listeners = new Set<() => void>();
  */
 let cachedRaw: string | null = null;
 let cachedExpenses: Expense[] = EMPTY;
+let mockApplied = false;
 
 function readStore(): Expense[] {
   let raw: string | null = null;
@@ -48,9 +25,25 @@ function readStore(): Expense[] {
     return EMPTY;
   }
 
+  // Primeira visita: grava o mock para as próximas leituras e recargas.
+  if (raw === null && !mockApplied) {
+    mockApplied = true;
+    try {
+      const mockRaw = JSON.stringify(MOCK_EXPENSES);
+      window.localStorage.setItem(STORAGE_KEY, mockRaw);
+      cachedRaw = mockRaw;
+      cachedExpenses = MOCK_EXPENSES;
+      return cachedExpenses;
+    } catch {
+      cachedRaw = null;
+      cachedExpenses = MOCK_EXPENSES;
+      return cachedExpenses;
+    }
+  }
+
   if (raw !== cachedRaw) {
     cachedRaw = raw;
-    cachedExpenses = raw ? parseStored(raw) : EMPTY;
+    cachedExpenses = resolveExpenses(raw);
   }
   return cachedExpenses;
 }

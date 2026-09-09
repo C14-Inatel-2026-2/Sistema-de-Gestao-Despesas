@@ -7,14 +7,20 @@ import { formatCurrency, formatDate } from "@/lib/expenses";
 
 interface ExpenseListProps {
   expenses: Expense[];
+  totalCount: number;
   onDelete: (id: string) => void;
 }
 
-export function ExpenseList({ expenses, onDelete }: ExpenseListProps) {
+export function ExpenseList({ expenses, totalCount, onDelete }: ExpenseListProps) {
   if (expenses.length === 0) {
+    const message =
+      totalCount === 0
+        ? "Nenhuma despesa cadastrada ainda. Use o formulário ao lado para adicionar a primeira."
+        : "Nenhuma despesa encontrada para os filtros selecionados.";
+
     return (
       <p className="rounded-xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
-        Nenhuma despesa encontrada para os filtros selecionados.
+        {message}
       </p>
     );
   }
