@@ -269,7 +269,7 @@ git commit -m "docs: atualiza documentação"
 * [ ] Cada integrante realizar pelo menos 1 commit;
 * [ ] Cada alteração ser enviada através de Pull Request;
 * [ ] Pull Requests serem aprovados por outro integrante;
-* [ ] Configurar CI/CD inicial.
+* [x] Configurar CI/CD inicial.
 
 ---
 
