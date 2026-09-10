@@ -30,17 +30,22 @@ src/
 │   ├── page.tsx            # Dashboard de despesas
 │   └── globals.css
 ├── components/             # Componentes de UI
-│   ├── ExpenseForm.tsx     # Cadastro com validação
-│   ├── ExpenseFilters.tsx  # Filtros por categoria e período
-│   ├── ExpenseList.tsx     # Listagem e exclusão
-│   └── ExpenseSummary.tsx  # Total, média e gastos por categoria
+│   ├── ExpenseForm.tsx
+│   ├── ExpenseFilters.tsx
+│   ├── ExpenseList.tsx
+│   └── ExpenseSummary.tsx
+├── data/
+│   └── mock.ts             # Despesas mock
 ├── hooks/
 │   └── useExpenses.ts      # Estado das despesas (localStorage por enquanto)
 ├── lib/
-│   ├── expenses.ts         # Regras de negócio (funções puras)
-│   └── expenses.test.ts    # Testes unitários das regras
+│   └── expenses.ts         # Regras de negócio (funções puras)
+├── tests/                  # Testes Vitest
+│   ├── components/
+│   ├── data/
+│   └── lib/
 └── types/
-    └── expense.ts          # Tipos e categorias
+    └── expense.ts
 ```
 
 ## Onde ficam as regras de negócio

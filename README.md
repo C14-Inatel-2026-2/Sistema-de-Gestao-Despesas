@@ -148,7 +148,8 @@ Sistema-de-Gestao-Despesas/
 │   │   ├── app/         # Rotas (App Router)
 │   │   ├── components/  # Componentes de UI
 │   │   ├── hooks/       # Estado compartilhado
-│   │   ├── lib/         # Regras de negócio + testes
+│   │   ├── lib/         # Regras de negócio
+│   │   ├── tests/       # Testes Vitest (components, data, lib)
 │   │   └── types/       # Tipos do domínio
 │   ├── public/
 │   ├── Dockerfile
@@ -184,16 +185,42 @@ Rodando os testes do frontend:
 
 ```bash
 cd frontend
+pnpm install
 pnpm test
+```
+
+Rodando o frontend em desenvolvimento:
+
+```bash
+cd frontend
+pnpm install
+pnpm dev
+```
+
+Se o comando `pnpm` não for reconhecido no Windows, instale uma vez com:
+
+```bash
+npm install -g pnpm
+```
+
+Abra `http://localhost:3000`. Na primeira visita o app carrega despesas mock no `localStorage` para facilitar a demonstração (cadastro, filtros, exclusão e totais).
+
+Rodando os testes do backend:
+
+```bash
+cd backend
+pip install -r requirements.txt
+pytest
 ```
 
 Funcionalidades já cobertas:
 
 * Validação de valores de despesas;
 * Cadastro de despesas (unitário e de componente);
-* Cálculo do total de despesas;
-* Filtro de despesas por categoria e por período;
-* Agrupamento de gastos por categoria.
+* Listagem, exclusão e estados vazios (componente);
+* Cálculo do total de despesas e resumo por categoria (domínio e componente);
+* Filtro de despesas por categoria e por período (domínio e componente);
+* Mock inicial.
 
 ---
 
@@ -264,7 +291,7 @@ git commit -m "docs: atualiza documentação"
 * [x] Definição das responsabilidades dos integrantes;
 * [x] Criar estrutura inicial de pastas;
 * [x] Desenvolver pelo menos uma pequena funcionalidade testável;
-* [ ] Criar `requirements.txt`;
+* [x] Criar `requirements.txt`;
 * [x] Criar `package.json`;
 * [ ] Cada integrante realizar pelo menos 1 commit;
 * [ ] Cada alteração ser enviada através de Pull Request;

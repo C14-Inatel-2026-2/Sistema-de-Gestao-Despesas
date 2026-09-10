@@ -11,7 +11,7 @@ import {
   sortByDateDesc,
   totalsByCategory,
   validateExpense,
-} from "./expenses";
+} from "@/lib/expenses";
 
 const HOJE = "2026-08-31";
 
