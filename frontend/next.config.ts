@@ -4,9 +4,10 @@ const nextConfig: NextConfig = {
   /**
    * Gera um servidor auto-contido em `.next/standalone`, com apenas as
    * dependências realmente usadas. É o que a imagem Docker copia.
-   * Na Vercel esta opção é ignorada — lá o build é feito pela própria plataforma.
+   * Fica desligado na Vercel (variável VERCEL), onde o build é feito pela
+   * própria plataforma e o modo standalone quebra a etapa final do build.
    */
-  output: "standalone",
+  output: process.env.VERCEL ? undefined : "standalone",
 };
 
 export default nextConfig;
