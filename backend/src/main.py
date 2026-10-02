@@ -52,3 +52,44 @@ def criar_despesa(
     db.commit()
     db.refresh(nova_despesa)
     return nova_despesa
+
+
+@app.put("/despesas/{despesa_id}", response_model=schemas.DespesaOut)
+def atualizar_despesa(
+    despesa_id: int, despesa: schemas.DespesaUpdate, db: Session = Depends(get_db)
+) -> models.Despesa:
+    """Atualiza uma despesa existente (substitui todos os campos)."""
+    despesa_existente = db.get(models.Despesa, despesa_id)
+    if despesa_existente is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Despesa {despesa_id} não encontrada.",
+        )
+ 
+    erros = validar_despesa(despesa.valor, despesa.descricao)
+    if erros:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=[{"campo": e.campo, "mensagem": e.mensagem} for e in erros],
+        )
+ 
+    for campo, valor in despesa.model_dump().items():
+        setattr(despesa_existente, campo, valor)
+ 
+    db.commit()
+    db.refresh(despesa_existente)
+    return despesa_existente
+
+
+@app.delete("/despesas/{despesa_id}", status_code=status.HTTP_204_NO_CONTENT)
+def excluir_despesa(despesa_id: int, db: Session = Depends(get_db)) -> None:
+    """Remove uma despesa pelo id."""
+    despesa_existente = db.get(models.Despesa, despesa_id)
+    if despesa_existente is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Despesa {despesa_id} não encontrada.",
+        )
+ 
+    db.delete(despesa_existente)
+    db.commit()
