@@ -1,11 +1,6 @@
-"""Testes unitários de despesas — Entrega 3 (Paulo).
+"""Testes unitários de despesas
 
 Framework: pytest (escolha do grupo para o backend).
-
-Critérios:
-- 2 testes COM mock
-- 2 testes SEM mock
-- 1 caso negativo
 """
 
 from datetime import date
@@ -16,12 +11,30 @@ from fastapi import HTTPException
 from pydantic import ValidationError
 
 import schemas
+import models
 from expenses import ErroValidacao
-from main import criar_despesa, listar_despesas
-
+from main import criar_despesa, listar_despesas, excluir_despesa
 
 # ---------------------------------------------------------------------------
-# SEM mock — testa a classe/schema DespesaCreate
+# testa a models
+# ---------------------------------------------------------------------------
+
+def test_despesa_model_armazena_os_atributos_corretamente():
+    """Testa a classe Despesa (model): os atributos ficam acessíveis após a criação."""
+    despesa = models.Despesa(
+        descricao="Almoço",
+        valor=35.5,
+        categoria="Alimentação",
+        data=date(2026, 9, 10),
+    )
+ 
+    assert despesa.descricao == "Almoço"
+    assert despesa.valor == 35.5
+    assert despesa.categoria == "Alimentação"
+    assert despesa.data == date(2026, 9, 10)
+
+# ---------------------------------------------------------------------------
+# testa a classe/schema DespesaCreate
 # ---------------------------------------------------------------------------
 
 
@@ -52,6 +65,23 @@ def test_despesa_create_rejeita_valor_negativo():
 
     erros = exc_info.value.errors()
     assert any(erro["loc"] == ("valor",) for erro in erros)
+
+# ---------------------------------------------------------------------------
+# testa a classe/schema DespesaUpdate
+# ---------------------------------------------------------------------------
+
+def test_despesa_update_aceita_payload_valido():
+    """DespesaUpdate aceita dados válidos."""
+    despesa = schemas.DespesaUpdate(
+        descricao="Cinema com pipoca",
+        valor=55,
+        categoria="Lazer",
+        data=date(2026, 9, 5),
+    )
+ 
+    assert despesa.descricao == "Cinema com pipoca"
+    assert despesa.valor == 55
+    assert despesa.categoria == "Lazer"
 
 
 # ---------------------------------------------------------------------------
@@ -92,3 +122,33 @@ def test_criar_despesa_levanta_422_quando_validacao_falha(mock_validar):
     db.add.assert_not_called()
     db.commit.assert_not_called()
     mock_validar.assert_called_once_with(payload.valor, payload.descricao)
+
+
+def test_criar_despesa_grava_no_banco_via_sessao_mockada():
+    """Testa criar_despesa() conferindo as chamadas feitas na Session mockada."""
+    db_mock = MagicMock()
+    dados = schemas.DespesaCreate(
+        descricao="Uber", valor=20, categoria="Transporte", data=date(2026, 9, 1)
+    )
+ 
+    criar_despesa(dados, db=db_mock)
+ 
+    db_mock.add.assert_called_once()
+    despesa_adicionada = db_mock.add.call_args[0][0]
+    assert isinstance(despesa_adicionada, models.Despesa)
+    assert despesa_adicionada.descricao == "Uber"
+    db_mock.commit.assert_called_once()
+    db_mock.refresh.assert_called_once_with(despesa_adicionada)
+ 
+ 
+def test_excluir_despesa_inexistente_nao_chama_delete():
+    """Teste NEGATIVO: se a despesa não existe, levanta 404 e não toca no banco."""
+    db_mock = MagicMock()
+    db_mock.get.return_value = None
+ 
+    with pytest.raises(HTTPException) as exc_info:
+        excluir_despesa(despesa_id=999, db=db_mock)
+ 
+    assert exc_info.value.status_code == 404
+    db_mock.delete.assert_not_called()
+    db_mock.commit.assert_not_called()
