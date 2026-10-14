@@ -1,4 +1,3 @@
-// Responsável: Marco Di Toro
 def ci
 pipeline {
   agent { label 'despesas-docker' }

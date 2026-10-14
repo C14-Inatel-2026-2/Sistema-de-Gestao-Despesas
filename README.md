@@ -226,17 +226,17 @@ Funcionalidades já cobertas:
 
 ## Pipeline de CI/CD — Entrega 4
 
-O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena cinco jobs independentes, definidos em `ci/`, com um responsável por integrante:
+O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena cinco jobs independentes, definidos em `ci/`, com Paulo Vicente responsável por build e deploy:
 
 | Job | Responsável | Resultado |
 | --- | --- | --- |
-| `despesas/qualidade` | Gabriel Texeira | ESLint, TypeScript e Ruff |
-| `despesas/testes-frontend` | Marco Di Toro | Vitest, JUnit e cobertura HTML/XML |
-| `despesas/testes-backend` | João Victor Siécola Souza | pytest, JUnit e cobertura HTML/XML |
-| `despesas/build` | André Dias Balbino | Imagens Docker do frontend e backend |
+| `despesas/qualidade` | — | ESLint, TypeScript e Ruff |
+| `despesas/testes-frontend` | — | Vitest, JUnit e cobertura HTML/XML |
+| `despesas/testes-backend` | — | pytest, JUnit e cobertura HTML/XML |
+| `despesas/build` | Paulo Vicente | Imagens Docker do frontend e backend |
 | `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
 
-A divisão indica os responsáveis pelos jobs; cada integrante deve revisar e executar seu job para apresentar a entrega.
+Os jobs de qualidade e testes ainda não têm responsável atribuído. Cada integrante deve definir sua contribuição e executar seu job para apresentar a entrega.
 
 ```mermaid
 flowchart LR
@@ -312,7 +312,8 @@ git commit -m "docs: atualiza documentação"
 ## Requisitos da Entrega 4
 
 * [x] Pipeline Jenkins com Build, Testes e Deploy;
-* [x] Cinco jobs independentes, um por integrante;
+* [x] Cinco jobs independentes;
+* [ ] Definir e comprovar pelo menos um job por integrante;
 * [x] Relatórios JUnit e cobertura HTML/XML no frontend e backend;
 * [x] Publicação dos relatórios e artefatos no Jenkins;
 * [x] Deploy da `main` com Docker Compose e healthchecks;

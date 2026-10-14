@@ -1,4 +1,3 @@
-// Responsável: João Victor Siécola Souza
 def ci
 pipeline {
   agent { label 'despesas-docker' }

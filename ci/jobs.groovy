@@ -6,14 +6,14 @@ folder('despesas') {
     description('Entrega 4 — jobs de CI/CD da equipe')
 }
 [
-    'qualidade': 'Gabriel Texeira',
-    'testes-frontend': 'Marco Di Toro',
-    'testes-backend': 'João Victor Siécola Souza',
-    'build': 'André Dias Balbino',
+    'qualidade': null,
+    'testes-frontend': null,
+    'testes-backend': null,
+    'build': 'Paulo Vicente',
     'deploy': 'Paulo Vicente'
 ].each { jobName, owner ->
     pipelineJob("despesas/${jobName}") {
-        description("Responsável: ${owner}. Executado pelo pipeline coordenador.")
+        description(owner ? "Responsável: ${owner}. Executado pelo pipeline coordenador." : "Executado pelo pipeline coordenador.")
         parameters {
             stringParam('SOURCE_COMMIT', '', 'SHA completo do commit validado')
         }

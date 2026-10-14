@@ -1,4 +1,3 @@
-// Responsável: Gabriel Texeira
 def ci
 pipeline {
   agent { label 'despesas-docker' }

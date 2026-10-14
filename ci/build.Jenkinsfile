@@ -1,4 +1,4 @@
-// Responsável: André Dias Balbino
+// Responsável: Paulo Vicente
 def ci
 pipeline {
   agent { label 'despesas-docker' }
