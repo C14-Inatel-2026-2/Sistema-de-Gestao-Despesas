@@ -1,3 +1,4 @@
+// Responsável: Paulo Vicente
 def ci
 pipeline {
   agent { label 'despesas-docker' }

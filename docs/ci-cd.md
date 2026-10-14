@@ -15,7 +15,7 @@ Este ambiente é uma demonstração em um único host. O frontend atual usa desp
 1. Crie um job Freestyle chamado `despesas-seed`, com SCM Git apontando para este repositório.
 2. Selecione a branch que contém a configuração. Para validar antes do merge, use `ci/entrega-4-jenkins` e altere `pipelineBranch` em `ci/jobs.groovy` para essa branch. Depois do merge, use `main` nos dois locais.
 3. Adicione a etapa **Process Job DSLs**, escolha o arquivo `ci/jobs.groovy` e execute. Se a instalação exigir aprovação administrativa de scripts, o administrador deve revisar e aprovar o DSL no Jenkins.
-4. Confirme os cinco jobs na pasta `despesas`. Cada um tem um Jenkinsfile próprio. Apenas build e deploy têm responsável atribuído: Paulo Vicente. O seed pode ser executado novamente para atualizar a configuração.
+4. Confirme os cinco jobs na pasta `despesas`. Cada um tem um Jenkinsfile próprio. Os cinco jobs têm Paulo Vicente como responsável. O seed pode ser executado novamente para atualizar a configuração.
 
 ## Criar o coordenador e disparar
 

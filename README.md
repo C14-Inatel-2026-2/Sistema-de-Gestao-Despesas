@@ -226,17 +226,17 @@ Funcionalidades já cobertas:
 
 ## Pipeline de CI/CD — Entrega 4
 
-O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena cinco jobs independentes, definidos em `ci/`, com Paulo Vicente responsável por build e deploy:
+O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena cinco jobs independentes, definidos em `ci/`, com Paulo Vicente responsável pelos cinco jobs:
 
 | Job | Responsável | Resultado |
 | --- | --- | --- |
-| `despesas/qualidade` | — | ESLint, TypeScript e Ruff |
-| `despesas/testes-frontend` | — | Vitest, JUnit e cobertura HTML/XML |
-| `despesas/testes-backend` | — | pytest, JUnit e cobertura HTML/XML |
+| `despesas/qualidade` | Paulo Vicente | ESLint, TypeScript e Ruff |
+| `despesas/testes-frontend` | Paulo Vicente | Vitest, JUnit e cobertura HTML/XML |
+| `despesas/testes-backend` | Paulo Vicente | pytest, JUnit e cobertura HTML/XML |
 | `despesas/build` | Paulo Vicente | Imagens Docker do frontend e backend |
 | `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
 
-Os jobs de qualidade e testes ainda não têm responsável atribuído. Cada integrante deve definir sua contribuição e executar seu job para apresentar a entrega.
+Os cinco jobs estão atribuídos a Paulo Vicente. Para atender ao requisito de pelo menos um job por integrante, os demais integrantes ainda devem definir e comprovar suas próprias contribuições.
 
 ```mermaid
 flowchart LR
