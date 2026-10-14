@@ -14,6 +14,14 @@ export default defineConfig({
     },
   },
   test: {
+    coverage: {
+      provider: "v8",
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/tests/**", "src/**/*.d.ts"],
+      reporter: ["text", "html", "cobertura"],
+      reportsDirectory: "coverage",
+      reportOnFailure: true,
+    },
     environment: "jsdom",
     globals: true,
     setupFiles: ["./vitest.setup.ts"],

@@ -1,47 +1,49 @@
 pipeline {
-  agent any
-
+  agent none
   options {
     timestamps()
-    skipDefaultCheckout(false)
+    disableConcurrentBuilds()
+    skipStagesAfterUnstable()
+    buildDiscarder(logRotator(numToKeepStr: '20'))
+    timeout(time: 45, unit: 'MINUTES')
   }
-
   stages {
-    stage('Frontend — lint, types e testes') {
+    stage('Checkout') {
+      agent { label 'despesas-docker' }
       steps {
-        sh '''
-          set -eu
-          docker run --rm \
-            -v "$PWD/frontend:/app" \
-            -w /app \
-            node:22-alpine \
-            sh -c "corepack enable && pnpm install --frozen-lockfile && pnpm lint && pnpm type-check && pnpm test"
-        '''
+        script {
+          env.SOURCE_COMMIT = sh(script: 'git rev-parse HEAD', returnStdout: true).trim()
+        }
       }
     }
-
-    stage('Backend — lint e testes') {
-      when {
-        expression { fileExists('backend/requirements.txt') }
-      }
+    stage('Qualidade') {
       steps {
-        sh '''
-          set -eu
-          docker run --rm \
-            -v "$PWD/backend:/app" \
-            -w /app \
-            python:3.12-slim \
-            sh -c "pip install --no-cache-dir -r requirements.txt ruff && ruff check . && pytest"
-        '''
+        build job: '/despesas/qualidade', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
       }
     }
-
-    stage('Docker — build da imagem') {
+    stage('Testes') {
+      parallel {
+        stage('Frontend') {
+          steps {
+            build job: '/despesas/testes-frontend', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+          }
+        }
+        stage('Backend') {
+          steps {
+            build job: '/despesas/testes-backend', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+          }
+        }
+      }
+    }
+    stage('Build') {
       steps {
-        sh '''
-          set -eu
-          docker compose build
-        '''
+        build job: '/despesas/build', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+      }
+    }
+    stage('Deploy') {
+      when { allOf { branch 'main'; not { changeRequest() } } }
+      steps {
+        build job: '/despesas/deploy', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
       }
     }
   }
