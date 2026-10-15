@@ -10,12 +10,12 @@
 
 Este ambiente é uma demonstração em um único host. O frontend atual usa despesas no localStorage, como já acontece no desenvolvimento; subir a API não muda essa integração. O backend usa SQLite persistente por padrão; não são necessários segredos para esta configuração.
 
-## Criar os sete jobs
+## Criar os oito jobs
 
 1. Crie um job Freestyle chamado `despesas-seed`, com SCM Git apontando para este repositório.
 2. Selecione a branch que contém a configuração. Para validar antes do merge, use `ci/entrega-4-jenkins` e altere `pipelineBranch` em `ci/jobs.groovy` para essa branch. Depois do merge, use `main` nos dois locais.
 3. Adicione a etapa **Process Job DSLs**, escolha o arquivo `ci/jobs.groovy` e execute. Se a instalação exigir aprovação administrativa de scripts, o administrador deve revisar e aprovar o DSL no Jenkins.
-4. Confirme os sete jobs na pasta `despesas`. Cada um tem um Jenkinsfile próprio. Paulo Vicente é responsável por `qualidade`, `testes-frontend`, `testes-backend`, `build` e `deploy`; João Victor Siécola Souza é responsável por `auditoria` e `smoke-test`. O seed pode ser executado novamente para atualizar a configuração.
+4. Confirme os oito jobs na pasta `despesas`. Cada um tem um Jenkinsfile próprio. Paulo Vicente é responsável por `qualidade`, `testes-frontend`, `testes-backend`, `build` e `deploy`; João Victor Siécola Souza é responsável por `auditoria` e `smoke-test`; Marco Di Toro é responsável por `lint-docker`. O seed pode ser executado novamente para atualizar a configuração.
 
 ## Criar o coordenador e disparar
 
@@ -24,11 +24,13 @@ Este ambiente é uma demonstração em um único host. O frontend atual usa desp
 3. Configure credenciais GitHub de leitura se necessárias para a descoberta. Habilite webhook de push e pull request em `https://SEU-JENKINS/github-webhook/`, ou configure varredura periódica no multibranch se o Jenkins não estiver acessível pelo GitHub.
 4. Execute **Scan Multibranch Pipeline Now**, abra a branch e clique em **Build Now**. O coordenador chama os jobs por caminho absoluto `/despesas/...` e propaga falhas.
 
-O coordenador faz qualidade → testes em paralelo → auditoria → build → deploy → smoke test. Branches e PRs rodam até o build. O deploy exige a branch `main`, sem contexto de PR, e verifica novamente que o SHA corresponde à ponta remota da `main`. Um build antigo é recusado se um novo commit já chegou à `main`. Os jobs não têm gatilhos próprios: o caminho normal é sempre pelo coordenador.
+O coordenador faz qualidade → testes em paralelo → auditoria → lint Docker → build → deploy → smoke test. Branches e PRs rodam até o build. O deploy exige a branch `main`, sem contexto de PR, e verifica novamente que o SHA corresponde à ponta remota da `main`. Um build antigo é recusado se um novo commit já chegou à `main`. Os jobs não têm gatilhos próprios: o caminho normal é sempre pelo coordenador.
 
 Cada job faz checkout do SHA recebido em `SOURCE_COMMIT`. O build cria `despesas-frontend:SHA` e `despesas-backend:SHA`. O deploy executa `docker compose -p despesas up -d --no-build --wait --wait-timeout 180`; não recompila e não remove o volume de dados. Em falhas, o Jenkins mostra o estado dos serviços e os últimos logs. Não há rollback automático; use uma imagem previamente validada em uma recuperação manual.
 
 O job `auditoria` roda em todas as branches e PRs. Ele executa `pnpm audit` no frontend e `pip-audit -r requirements.txt` no backend e consulta bases públicas de vulnerabilidades, por isso precisa de acesso à internet. Vulnerabilidades encontradas deixam o estágio amarelo (unstable), mas o job termina com sucesso e não bloqueia o build nem o deploy, porque novos alertas são publicados mesmo sem mudanças no código. Em **Artifacts** ficam `reports/auditoria.txt` (resumo por severidade) e os relatórios completos em texto e JSON de cada aplicação.
+
+O job `lint-docker` roda antes do build, em todas as branches e PRs. Ele executa o hadolint (imagem `hadolint/hadolint:v2.12.0`) em `frontend/Dockerfile` e `backend/Dockerfile` e valida o `docker-compose.yml` com `docker compose config`. Qualquer aviso do hadolint ou erro no compose deixa o job vermelho. O resultado fica em **Artifacts** (`reports/lint-docker.txt`).
 
 Depois do deploy, o job `smoke-test` faz quatro chamadas HTTP pelo container `curlimages/curl`, na rede do host: frontend com HTTP 200, `/health` com `status: ok`, `GET /despesas` com HTTP 200 e um `POST /despesas` inválido, que deve ser recusado com HTTP 422 sem gravar dados. Cada verificação é registrada em `reports/smoke-test.txt`, publicado em **Artifacts**; qualquer falha deixa o job e o coordenador vermelhos. As portas seguem `FRONTEND_PORT` e `BACKEND_PORT`, como no deploy.
 
@@ -42,7 +44,7 @@ Nos jobs `testes-frontend` e `testes-backend`, abra a execução e consulte:
 
 O frontend usa V8 com Vitest; o backend usa pytest-cov. Os relatórios são publicados no `post { always }` da etapa de testes. Se a instalação de dependências impedir até mesmo a execução dos testes, a falta de relatório é tratada como falha, sem reaproveitar arquivos antigos. A política de segurança de conteúdo do Jenkins pode limitar recursos visuais do HTML; nesse caso, baixe os artefatos e abra `index.html` localmente, sem desativar a proteção global.
 
-Para a entrega, registre a tela do coordenador, os sete jobs, resultados JUnit, as duas coberturas, o `auditoria.txt` da auditoria, o deploy saudável e o `smoke-test.txt` do smoke test. No host, confira `http://localhost:3000` e `http://localhost:8000/health`. O líder deve enviar o link do repositório; configurar o Jenkins e obter as aprovações são passos externos ao código.
+Para a entrega, registre a tela do coordenador, os oito jobs, resultados JUnit, as duas coberturas, o `auditoria.txt` da auditoria, o deploy saudável e o `smoke-test.txt` do smoke test e o `lint-docker.txt` do lint Docker. No host, confira `http://localhost:3000` e `http://localhost:8000/health`. O líder deve enviar o link do repositório; configurar o Jenkins e obter as aprovações são passos externos ao código.
 
 ## Reproduzir testes localmente
 

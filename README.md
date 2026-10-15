@@ -226,7 +226,7 @@ Funcionalidades já cobertas:
 
 ## Pipeline de CI/CD — Entrega 4
 
-O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena sete jobs independentes, definidos em `ci/`:
+O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena oito jobs independentes, definidos em `ci/`:
 
 | Job | Responsável | Resultado |
 | --- | --- | --- |
@@ -234,11 +234,12 @@ O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena sete jo
 | `despesas/testes-frontend` | Paulo Vicente | Vitest, JUnit e cobertura HTML/XML |
 | `despesas/testes-backend` | Paulo Vicente | pytest, JUnit e cobertura HTML/XML |
 | `despesas/auditoria` | João Victor Siécola Souza | `pnpm audit` e `pip-audit` sobre as dependências, sem bloquear o pipeline |
+| `despesas/lint-docker` | Marco Di Toro | hadolint nos Dockerfiles e validação do `docker-compose.yml` |
 | `despesas/build` | Paulo Vicente | Imagens Docker do frontend e backend |
 | `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
 | `despesas/smoke-test` | João Victor Siécola Souza | Chamadas HTTP reais ao frontend e à API após o deploy |
 
-Para atender ao requisito de pelo menos um job por integrante, os demais integrantes ainda devem definir e comprovar suas próprias contribuições.
+Para atender ao requisito de pelo menos um job por integrante, André Dias Balbino e Gabriel Gazotti ainda devem definir e comprovar suas próprias contribuições.
 
 ```mermaid
 flowchart LR
@@ -247,7 +248,8 @@ flowchart LR
     B --> D[Testes backend]
     C --> X[Auditoria de dependências]
     D --> X
-    X --> E[Build das imagens]
+    X --> L[Lint Docker]
+    L --> E[Build das imagens]
     E --> F{Branch main?}
     F -->|Sim| G[Deploy Docker Compose]
     F -->|Não| H[Aguarda revisão e merge]
@@ -316,7 +318,7 @@ git commit -m "docs: atualiza documentação"
 ## Requisitos da Entrega 4
 
 * [x] Pipeline Jenkins com Build, Testes e Deploy;
-* [x] Sete jobs independentes;
+* [x] Oito jobs independentes;
 * [ ] Definir e comprovar pelo menos um job por integrante;
 * [x] Relatórios JUnit e cobertura HTML/XML no frontend e backend;
 * [x] Publicação dos relatórios e artefatos no Jenkins;
