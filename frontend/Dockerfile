@@ -30,7 +30,8 @@ WORKDIR /app
 COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 ENV NEXT_TELEMETRY_DISABLED=1
-RUN pnpm build
+# O projeto pode não ter assets públicos versionados.
+RUN mkdir -p public && pnpm build
 
 # --- Runtime ----------------------------------------------------------------
 FROM base AS runner

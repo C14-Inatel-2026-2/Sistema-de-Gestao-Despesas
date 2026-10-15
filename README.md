@@ -224,28 +224,37 @@ Funcionalidades já cobertas:
 
 ---
 
-## Pipeline de CI/CD
+## Pipeline de CI/CD — Entrega 4
 
-Nenhuma alteração entra na `main` sem passar pelos testes automatizados e pela revisão de outro integrante.
+O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena cinco jobs independentes, definidos em `ci/`, com Paulo Vicente responsável pelos cinco jobs:
+
+| Job | Responsável | Resultado |
+| --- | --- | --- |
+| `despesas/qualidade` | Paulo Vicente | ESLint, TypeScript e Ruff |
+| `despesas/testes-frontend` | Paulo Vicente | Vitest, JUnit e cobertura HTML/XML |
+| `despesas/testes-backend` | Paulo Vicente | pytest, JUnit e cobertura HTML/XML |
+| `despesas/build` | Paulo Vicente | Imagens Docker do frontend e backend |
+| `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
+
+Os cinco jobs estão atribuídos a Paulo Vicente. Para atender ao requisito de pelo menos um job por integrante, os demais integrantes ainda devem definir e comprovar suas próprias contribuições.
 
 ```mermaid
-flowchart TD
-    A["Desenvolvedor<br/>feature/minha-feature"] --> B["Push para o GitHub"]
-    B --> C["Abre Pull Request para a main"]
-    C --> D["Jenkins"]
-    D --> E["Frontend<br/>lint + type-check + Vitest"]
-    D --> F["Backend<br/>Ruff + pytest"]
-    D --> M["E2E<br/>Playwright sobre o Docker Compose"]
-    E --> G{"Tudo verde?"}
-    F --> G
-    M --> G
-    G -->|"Não"| H["Corrigir e enviar novo commit"]
-    H --> B
-    G -->|"Sim"| I["Revisão de outro integrante"]
-    I -->|"Aprovado"| J["Merge na main"]
-    J --> K["Deploy do frontend<br/>Vercel"]
-    J --> L["Deploy do backend<br/>imagem Docker"]
+flowchart LR
+    A[Push / PR] --> B[Qualidade]
+    B --> C[Testes frontend]
+    B --> D[Testes backend]
+    C --> E[Build das imagens]
+    D --> E
+    E --> F{Branch main?}
+    F -->|Sim| G[Deploy Docker Compose]
+    F -->|Não| H[Aguarda revisão e merge]
 ```
+
+Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o mesmo SHA; as imagens são identificadas por esse SHA. O deploy roda apenas na `main`, reutiliza as imagens do build e aguarda frontend e API ficarem saudáveis. Este deploy usa Docker Compose no agente Jenkins; a hospedagem existente na Vercel continua independente.
+
+Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes; não há percentual mínimo imposto nesta entrega.
+
+O roteiro de instalação, execução, evidências e limitações está em [docs/ci-cd.md](docs/ci-cd.md).
 
 ---
 
@@ -266,7 +275,7 @@ alembic upgrade head
 
 ## Fluxo de trabalho
 
-Cada integrante trabalha na própria branch e envia as alterações por Pull Request, que precisa ser aprovado por **outro integrante** antes do merge na `main`. Cada integrante deve fazer no mínimo um commit no projeto.
+Cada integrante trabalha na própria branch e envia as alterações por Pull Request, que precisa ser aprovado por **dois outros integrantes** antes do merge na `main`. Cada integrante deve fazer no mínimo um commit no projeto.
 
 ```bash
 git checkout -b feature/nome-da-feature
@@ -300,6 +309,19 @@ git commit -m "docs: atualiza documentação"
 
 ---
 
+## Requisitos da Entrega 4
+
+* [x] Pipeline Jenkins com Build, Testes e Deploy;
+* [x] Cinco jobs independentes;
+* [ ] Definir e comprovar pelo menos um job por integrante;
+* [x] Relatórios JUnit e cobertura HTML/XML no frontend e backend;
+* [x] Publicação dos relatórios e artefatos no Jenkins;
+* [x] Deploy da `main` com Docker Compose e healthchecks;
+* [ ] Configurar a instância Jenkins e executar o pipeline completo;
+* [ ] Registrar evidências da execução e das coberturas;
+* [ ] Obter duas aprovações no PR;
+* [ ] Líder enviar o link do repositório até **17/10/2026 às 23:59**.
+
 ## Status
 
-Em desenvolvimento. Primeira etapa focada na definição da arquitetura, organização do repositório, primeiras funcionalidades testáveis e configuração do fluxo de Git, Pull Requests e CI/CD.
+Em desenvolvimento. A configuração da Entrega 4 está versionada; a validação completa no Jenkins e as evidências da execução devem ser concluídas antes do envio.
