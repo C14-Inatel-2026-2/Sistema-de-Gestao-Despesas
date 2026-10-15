@@ -12,7 +12,8 @@ folder('despesas') {
     'build': 'Paulo Vicente',
     'deploy': 'Paulo Vicente',
     'smoke-test': 'João Victor Siécola Souza',
-    'auditoria': 'João Victor Siécola Souza'
+    'auditoria': 'João Victor Siécola Souza',
+    'lint-docker': 'Marco Di Toro'
 ].each { jobName, owner ->
     pipelineJob("despesas/${jobName}") {
         description("Responsável: ${owner}. Executado pelo pipeline coordenador.")
