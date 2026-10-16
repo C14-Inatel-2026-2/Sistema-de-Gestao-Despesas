@@ -31,9 +31,8 @@ def upgrade() -> None:
             server_default=sa.text("CURRENT_TIMESTAMP"),
         ),
     )
-    op.create_index("ix_despesas_categoria", "despesas", ["categoria"])
+
 
 
 def downgrade() -> None:
-    op.drop_index("ix_despesas_categoria", table_name="despesas")
     op.drop_table("despesas")
