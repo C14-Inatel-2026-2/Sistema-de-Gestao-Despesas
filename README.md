@@ -226,13 +226,14 @@ Funcionalidades já cobertas:
 
 ## Pipeline de CI/CD — Entrega 4
 
-O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena sete jobs independentes, definidos em `ci/`:
+O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena oito jobs independentes, definidos em `ci/`:
 
 | Job | Responsável | Resultado |
 | --- | --- | --- |
 | `despesas/qualidade` | Paulo Vicente | ESLint, TypeScript e Ruff |
 | `despesas/testes-frontend` | Paulo Vicente | Vitest, JUnit e cobertura HTML/XML |
 | `despesas/testes-backend` | Paulo Vicente | pytest, JUnit e cobertura HTML/XML |
+| `despesas/cobertura-minima` | Gabriel Gazotti | Vitest e pytest-cov com mínimo de 80% de cobertura; falha o pipeline abaixo disso |
 | `despesas/auditoria` | João Victor Siécola Souza | `pnpm audit` e `pip-audit` sobre as dependências, sem bloquear o pipeline |
 | `despesas/build` | Paulo Vicente | Imagens Docker do frontend e backend |
 | `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
@@ -245,8 +246,9 @@ flowchart LR
     A[Push / PR] --> B[Qualidade]
     B --> C[Testes frontend]
     B --> D[Testes backend]
-    C --> X[Auditoria de dependências]
-    D --> X
+    C --> M[Cobertura mínima]
+    D --> M
+    M --> X[Auditoria de dependências]
     X --> E[Build das imagens]
     E --> F{Branch main?}
     F -->|Sim| G[Deploy Docker Compose]
@@ -256,7 +258,7 @@ flowchart LR
 
 Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o mesmo SHA; as imagens são identificadas por esse SHA. O deploy roda apenas na `main`, reutiliza as imagens do build e aguarda frontend e API ficarem saudáveis. Em seguida, o smoke test acessa o frontend, `/health` e `GET /despesas`, e confirma que um `POST /despesas` inválido é recusado com 422; o resultado fica em **Artifacts** (`reports/smoke-test.txt`). Este deploy usa Docker Compose no agente Jenkins; a hospedagem existente na Vercel continua independente.
 
-Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes; não há percentual mínimo imposto nesta entrega.
+Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes. O job `cobertura-minima` exige pelo menos 80% de cobertura de linhas e statements no frontend e no backend; abaixo disso o pipeline falha antes do build.
 
 O roteiro de instalação, execução, evidências e limitações está em [docs/ci-cd.md](docs/ci-cd.md).
 
@@ -316,7 +318,7 @@ git commit -m "docs: atualiza documentação"
 ## Requisitos da Entrega 4
 
 * [x] Pipeline Jenkins com Build, Testes e Deploy;
-* [x] Sete jobs independentes;
+* [x] Oito jobs independentes;
 * [ ] Definir e comprovar pelo menos um job por integrante;
 * [x] Relatórios JUnit e cobertura HTML/XML no frontend e backend;
 * [x] Publicação dos relatórios e artefatos no Jenkins;
