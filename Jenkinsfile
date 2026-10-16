@@ -35,6 +35,11 @@ pipeline {
         }
       }
     }
+    stage('Cobertura mínima') {
+      steps {
+        build job: '/despesas/cobertura-minima', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+      }
+    }
     stage('Auditoria') {
       steps {
         build job: '/despesas/auditoria', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
