@@ -33,6 +33,16 @@ pipeline {
             build job: '/despesas/testes-backend', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
           }
         }
+        stage('Migrações') {
+          steps {
+            build job: '/despesas/migracoes', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+          }
+        }
+      }
+    }
+    stage('Cobertura mínima') {
+      steps {
+        build job: '/despesas/cobertura-minima', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
       }
     }
     stage('Auditoria') {

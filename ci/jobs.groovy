@@ -13,6 +13,8 @@ folder('despesas') {
     'deploy': 'Paulo Vicente',
     'smoke-test': 'João Victor Siécola Souza',
     'auditoria': 'João Victor Siécola Souza',
+    'cobertura-minima': 'Gabriel Gazotti',
+    'migracoes': 'André Dias Balbino',
     'lint-docker': 'Marco Di Toro'
 ].each { jobName, owner ->
     pipelineJob("despesas/${jobName}") {
