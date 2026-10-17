@@ -50,6 +50,11 @@ pipeline {
         build job: '/despesas/auditoria', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
       }
     }
+    stage('Lint Docker') {
+      steps {
+        build job: '/despesas/lint-docker', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+      }
+    }
     stage('Build') {
       steps {
         build job: '/despesas/build', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]

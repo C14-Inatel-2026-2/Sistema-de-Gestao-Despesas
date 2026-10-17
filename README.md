@@ -235,11 +235,12 @@ O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena oito jo
 | `despesas/testes-backend` | Paulo Vicente | pytest, JUnit e cobertura HTML/XML |
 | `despesas/cobertura-minima` | Gabriel Gazotti | Vitest e pytest-cov com mínimo de 80% de cobertura; falha o pipeline abaixo disso |
 | `despesas/auditoria` | João Victor Siécola Souza | `pnpm audit` e `pip-audit` sobre as dependências, sem bloquear o pipeline |
+| `despesas/lint-docker` | Marco Di Toro | hadolint nos Dockerfiles e validação do `docker-compose.yml` |
 | `despesas/build` | Paulo Vicente | Imagens Docker do frontend e backend |
 | `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
 | `despesas/smoke-test` | João Victor Siécola Souza | Chamadas HTTP reais ao frontend e à API após o deploy |
 
-Para atender ao requisito de pelo menos um job por integrante, os demais integrantes ainda devem definir e comprovar suas próprias contribuições.
+Para atender ao requisito de pelo menos um job por integrante, André Dias Balbino e Gabriel Gazotti ainda devem definir e comprovar suas próprias contribuições.
 
 ```mermaid
 flowchart LR
@@ -249,7 +250,8 @@ flowchart LR
     C --> M[Cobertura mínima]
     D --> M
     M --> X[Auditoria de dependências]
-    X --> E[Build das imagens]
+    X --> L[Lint Docker]
+    L --> E[Build das imagens]
     E --> F{Branch main?}
     F -->|Sim| G[Deploy Docker Compose]
     F -->|Não| H[Aguarda revisão e merge]
