@@ -29,6 +29,50 @@ Funcionalidades previstas:
 
 ---
 
+## Requisitos
+
+### Requisitos funcionais
+
+| ID    | Requisito                                                                 | Situação      |
+| ----- | ------------------------------------------------------------------------- | ------------- |
+| RF01  | O usuário cadastra uma despesa com descrição, valor, data e categoria     | Pronto        |
+| RF02  | O usuário lista as despesas cadastradas                                   | Pronto        |
+| RF03  | O usuário edita uma despesa                                               | Só na API     |
+| RF04  | O usuário exclui uma despesa                                              | Pronto        |
+| RF05  | Toda despesa pertence a uma categoria (Alimentação, Transporte, Moradia, Saúde, Educação, Lazer ou Outros) | Pronto |
+| RF06  | O usuário filtra as despesas por período e por categoria                  | Pronto        |
+| RF07  | O sistema mostra o total das despesas e o total por categoria             | Pronto        |
+| RF08  | O sistema mostra um dashboard com gráficos dos gastos                     | Pendente      |
+| RF09  | As despesas ficam salvas no servidor (API + PostgreSQL)                   | Pendente      |
+| RF10  | A API lista as categorias em `GET /categorias`                            | Pendente      |
+
+Hoje o frontend guarda as despesas no `localStorage`; a integração com a API é o RF09.
+
+### Requisitos não funcionais
+
+| ID     | Requisito                                                                                  |
+| ------ | ------------------------------------------------------------------------------------------ |
+| RNF01  | A interface é responsiva e funciona em celular e desktop                                   |
+| RNF02  | Os dados são validados no frontend e de novo na API (valor maior que zero, data não futura, categoria existente) |
+| RNF03  | A API segue o padrão REST com JSON e é documentada automaticamente em `/docs` (OpenAPI)    |
+| RNF04  | O código tem pelo menos 80% de cobertura de testes no frontend e no backend                |
+| RNF05  | Toda alteração passa por Pull Request com duas aprovações e pelo pipeline Jenkins           |
+| RNF06  | A aplicação sobe com `docker compose`, sem instalação manual de dependências               |
+| RNF07  | As mudanças no banco são versionadas com Alembic                                           |
+| RNF08  | Valores são exibidos em reais (R$)                                                         |
+
+---
+
+## Gestão do projeto
+
+O grupo usa Kanban no GitHub Projects, com as colunas **Todo**, **In Progress** e **Done**: [quadro do projeto](https://github.com/orgs/C14-Inatel-2026-2/projects/10).
+
+* Cada funcionalidade é uma história de usuário (issue com o label `user-story`), no formato "Como… quero… para…" e com critérios de aceite em checklist.
+* Tarefas técnicas, como os jobs de CI, são issues comuns.
+* Cada issue tem um responsável e é fechada pelo Pull Request que a conclui.
+
+---
+
 ## Tecnologias
 
 ### Frontend
