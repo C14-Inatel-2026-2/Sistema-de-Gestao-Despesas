@@ -33,16 +33,20 @@ Funcionalidades previstas:
 
 Os requisitos a seguir definem o escopo esperado, sem indicar conclusão da implementação.
 
-| Código | Requisito |
-| --- | --- |
-| RF01 | Permitir cadastrar despesas com valor, descrição, categoria e data. |
-| RF02 | Permitir editar despesas cadastradas. |
-| RF03 | Permitir excluir despesas. |
-| RF04 | Listar todas as despesas cadastradas. |
-| RF05 | Permitir categorizar despesas. |
-| RF06 | Permitir filtrar despesas por período e categoria. |
-| RF07 | Calcular e apresentar o valor total das despesas. |
-| RF08 | Disponibilizar um dashboard para acompanhamento dos gastos. |
+| Código | Requisito | Situação |
+| --- | --- | --- |
+| RF01 | Permitir cadastrar despesas com valor, descrição, categoria e data. | Implementado no frontend local e na API |
+| RF02 | Permitir editar despesas cadastradas. | Implementado apenas na API; interface pendente |
+| RF03 | Permitir excluir despesas. | Implementado no frontend local e na API |
+| RF04 | Listar todas as despesas cadastradas. | Implementado no frontend local e na API |
+| RF05 | Permitir categorizar despesas em Alimentação, Transporte, Moradia, Saúde, Educação, Lazer ou Outros. | Implementado no frontend |
+| RF06 | Permitir filtrar despesas por período e categoria. | Implementado no frontend local |
+| RF07 | Calcular e apresentar o valor total das despesas e o total por categoria. | Implementado no frontend local |
+| RF08 | Disponibilizar um dashboard com gráficos para acompanhamento dos gastos. | Pendente |
+| RF09 | Manter as despesas salvas no servidor por meio da API e do PostgreSQL. | Integração pendente |
+| RF10 | Listar as categorias na API pelo endpoint `GET /categorias`. | Pendente |
+
+O frontend mantém atualmente as despesas no `localStorage`; a integração com o servidor corresponde ao RF09. A situação indica presença de implementação no código, sem comprovar validação completa dos critérios de aceite.
 
 ## ⚙️ Requisitos Não Funcionais
 
@@ -57,12 +61,19 @@ Os requisitos a seguir definem o escopo esperado, sem indicar conclusão da impl
 | RNF07 | O sistema deverá possuir testes automatizados utilizando pytest e Playwright. |
 | RNF08 | O projeto deverá utilizar GitHub para versionamento, com branches e Pull Requests. |
 | RNF09 | O pipeline CI/CD deverá utilizar GitHub Actions para executar verificações automatizadas. |
+| RNF10 | Os dados deverão ser validados no frontend e na API: valor maior que zero, data não futura e categoria existente. |
+| RNF11 | A API deverá seguir o padrão REST com JSON. |
+| RNF12 | O código deverá possuir pelo menos 80% de cobertura de testes no frontend e no backend. |
+| RNF13 | Toda alteração deverá passar por Pull Request com duas aprovações e pelas verificações do pipeline Jenkins existente. |
+| RNF14 | A aplicação deverá iniciar com Docker Compose, sem instalação manual das dependências das aplicações no host. |
+| RNF15 | As mudanças no banco deverão ser versionadas com Alembic. |
+| RNF16 | Os valores deverão ser exibidos em reais (R$). |
 
 Esses requisitos representam o estado esperado para a Entrega 5. O RNF04 depende da configuração do PostgreSQL, pois o ambiente local e o backend no Docker Compose utilizam SQLite por padrão. Há testes pytest e Vitest no repositório, mas não foi identificada configuração de testes Playwright. O RNF09 permanece pendente: a configuração de CI/CD versionada utiliza Jenkins, conforme a seção da Entrega 4; não há workflows do GitHub Actions no repositório.
 
 ## 🔄 Metodologia Ágil — Kanban
 
-O grupo utiliza a metodologia Kanban por meio do GitHub Projects para organizar e acompanhar as atividades. O quadro permite acompanhar o progresso do desenvolvimento nas seguintes colunas:
+O grupo utiliza a metodologia Kanban por meio do [GitHub Projects — quadro do projeto](https://github.com/orgs/C14-Inatel-2026-2/projects/10) para organizar e acompanhar as atividades. O quadro permite acompanhar o progresso do desenvolvimento nas seguintes colunas:
 
 | Coluna | Descrição |
 | --- | --- |
@@ -73,6 +84,11 @@ O grupo utiliza a metodologia Kanban por meio do GitHub Projects para organizar 
 As funcionalidades são organizadas em histórias de usuário, cadastradas como issues e organizadas no GitHub Projects. Cada história deve conter título, descrição, critérios de aceite e responsável. Cada integrante deve criar pelo menos uma história de usuário, e o projeto deve possuir pelo menos cinco histórias.
 
 A equipe utiliza branches e Pull Requests para organizar as alterações no código, seguindo as regras da seção “Fluxo de trabalho”. A criação das issues, a participação de cada integrante e a organização do quadro devem ser comprovadas no GitHub; esta documentação não atesta a conclusão dessas atividades.
+
+
+As histórias devem utilizar o formato “Como… quero… para…” e o label `user-story`, com critérios de aceite em checklist. Tarefas técnicas, como jobs de CI, são registradas como issues comuns. Cada issue deve ter um responsável e, quando envolver implementação no repositório, ser vinculada ao Pull Request que a conclui.
+
+Os códigos RF e RNF foram consolidados nesta revisão: RF01–RF08 e RNF01–RNF09 seguem a numeração da Entrega 5; os requisitos adicionais da documentação anterior foram preservados como RF09–RF10 e RNF10–RNF16. Referências antigas devem ser conferidas pelo conteúdo do requisito.
 
 ---
 
@@ -275,33 +291,41 @@ Funcionalidades contempladas nos arquivos de testes existentes (a presença dos 
 
 ## Pipeline de CI/CD — Entrega 4
 
-O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena cinco jobs independentes, definidos em `ci/`, com Paulo Vicente responsável pelos cinco jobs:
+O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena oito jobs independentes, definidos em `ci/`:
 
 | Job | Responsável | Resultado |
 | --- | --- | --- |
 | `despesas/qualidade` | Paulo Vicente | ESLint, TypeScript e Ruff |
 | `despesas/testes-frontend` | Paulo Vicente | Vitest, JUnit e cobertura HTML/XML |
 | `despesas/testes-backend` | Paulo Vicente | pytest, JUnit e cobertura HTML/XML |
+| `despesas/cobertura-minima` | Gabriel Gazotti | Vitest e pytest-cov com mínimo de 80% de cobertura; falha o pipeline abaixo disso |
+| `despesas/auditoria` | João Victor Siécola Souza | `pnpm audit` e `pip-audit` sobre as dependências, sem bloquear o pipeline |
+| `despesas/lint-docker` | Marco Di Toro | hadolint nos Dockerfiles e validação do `docker-compose.yml` |
 | `despesas/build` | Paulo Vicente | Imagens Docker do frontend e backend |
 | `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
+| `despesas/smoke-test` | João Victor Siécola Souza | Chamadas HTTP reais ao frontend e à API após o deploy |
 
-Os cinco jobs estão atribuídos a Paulo Vicente. Para atender ao requisito de pelo menos um job por integrante, os demais integrantes ainda devem definir e comprovar suas próprias contribuições.
+Para atender ao requisito de pelo menos um job por integrante, André Dias Balbino e Gabriel Gazotti ainda devem definir e comprovar suas próprias contribuições.
 
 ```mermaid
 flowchart LR
     A[Push / PR] --> B[Qualidade]
     B --> C[Testes frontend]
     B --> D[Testes backend]
-    C --> E[Build das imagens]
-    D --> E
+    C --> M[Cobertura mínima]
+    D --> M
+    M --> X[Auditoria de dependências]
+    X --> L[Lint Docker]
+    L --> E[Build das imagens]
     E --> F{Branch main?}
     F -->|Sim| G[Deploy Docker Compose]
     F -->|Não| H[Aguarda revisão e merge]
+    G --> I[Smoke test]
 ```
 
-Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o mesmo SHA; as imagens são identificadas por esse SHA. O deploy roda apenas na `main`, reutiliza as imagens do build e aguarda frontend e API ficarem saudáveis. Este deploy usa Docker Compose no agente Jenkins; a hospedagem existente na Vercel continua independente.
+Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o mesmo SHA; as imagens são identificadas por esse SHA. O deploy roda apenas na `main`, reutiliza as imagens do build e aguarda frontend e API ficarem saudáveis. Em seguida, o smoke test acessa o frontend, `/health` e `GET /despesas`, e confirma que um `POST /despesas` inválido é recusado com 422; o resultado fica em **Artifacts** (`reports/smoke-test.txt`). Este deploy usa Docker Compose no agente Jenkins; a hospedagem existente na Vercel continua independente.
 
-Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes; não há percentual mínimo imposto nesta entrega.
+Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes. O job `cobertura-minima` exige pelo menos 80% de cobertura de linhas e statements no frontend e no backend; abaixo disso o pipeline falha antes do build.
 
 O roteiro de instalação, execução, evidências e limitações está em [docs/ci-cd.md](docs/ci-cd.md).
 
@@ -363,7 +387,7 @@ git commit -m "docs: atualiza documentação"
 Os itens marcados abaixo indicam configuração presente no repositório, sem comprovar execução no Jenkins, publicação de relatórios ou deploy bem-sucedido.
 
 * [x] Pipeline Jenkins com Build, Testes e Deploy;
-* [x] Cinco jobs independentes;
+* [x] Oito jobs independentes;
 * [ ] Definir e comprovar pelo menos um job por integrante;
 * [x] Relatórios JUnit e cobertura HTML/XML no frontend e backend;
 * [ ] Publicação dos relatórios e artefatos no Jenkins (configurada; execução e evidências pendentes);

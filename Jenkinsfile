@@ -33,6 +33,26 @@ pipeline {
             build job: '/despesas/testes-backend', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
           }
         }
+        stage('Migrações') {
+          steps {
+            build job: '/despesas/migracoes', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+          }
+        }
+      }
+    }
+    stage('Cobertura mínima') {
+      steps {
+        build job: '/despesas/cobertura-minima', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+      }
+    }
+    stage('Auditoria') {
+      steps {
+        build job: '/despesas/auditoria', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+      }
+    }
+    stage('Lint Docker') {
+      steps {
+        build job: '/despesas/lint-docker', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
       }
     }
     stage('Build') {
@@ -44,6 +64,12 @@ pipeline {
       when { allOf { branch 'main'; not { changeRequest() } } }
       steps {
         build job: '/despesas/deploy', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
+      }
+    }
+    stage('Smoke test') {
+      when { allOf { branch 'main'; not { changeRequest() } } }
+      steps {
+        build job: '/despesas/smoke-test', parameters: [string(name: 'SOURCE_COMMIT', value: env.SOURCE_COMMIT)]
       }
     }
   }
