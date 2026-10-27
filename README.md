@@ -2,16 +2,16 @@
 
 Aplicação web para controle de despesas pessoais: cadastro, categorização, filtros por período e acompanhamento dos gastos.
 
-Frontend em Next.js hospedado na Vercel, backend em Python com API REST.
+Frontend em Next.js (React) com TypeScript, hospedado na Vercel, e backend em Python com FastAPI para a API REST. PostgreSQL é o banco previsto para produção; a configuração local utiliza SQLite por padrão.
 
 ## Integrantes
 
-| Integrante                    | Responsabilidades      |
-| ----------------------------- | ---------------------- |
-| **Marco Di Toro**               | UI/UX, Backend e QA    |
-| **Gabriel Texeira**           | Frontend e QA          |
-| **Paulo Vicente**             | DevOps, CI/CD e QA     |
-| **André Dias Balbino**        | Frontend, Backend e QA |
+| Integrante | Responsabilidades |
+| --- | --- |
+| **Marco Di Toro** | UI/UX, Backend e QA |
+| **Gabriel Texeira** | Frontend e QA |
+| **Paulo Vicente** | DevOps, CI/CD e QA |
+| **André Dias Balbino** | Frontend, Backend e QA |
 | **João Victor Siécola Souza** | Frontend, Backend e QA |
 
 ## Objetivo
@@ -29,12 +29,58 @@ Funcionalidades previstas:
 
 ---
 
+## 📋 Requisitos Funcionais
+
+Os requisitos a seguir definem o escopo esperado, sem indicar conclusão da implementação.
+
+| Código | Requisito |
+| --- | --- |
+| RF01 | Permitir cadastrar despesas com valor, descrição, categoria e data. |
+| RF02 | Permitir editar despesas cadastradas. |
+| RF03 | Permitir excluir despesas. |
+| RF04 | Listar todas as despesas cadastradas. |
+| RF05 | Permitir categorizar despesas. |
+| RF06 | Permitir filtrar despesas por período e categoria. |
+| RF07 | Calcular e apresentar o valor total das despesas. |
+| RF08 | Disponibilizar um dashboard para acompanhamento dos gastos. |
+
+## ⚙️ Requisitos Não Funcionais
+
+| Código | Requisito |
+| --- | --- |
+| RNF01 | A interface deverá ser responsiva para computadores, tablets e celulares. |
+| RNF02 | O backend deverá utilizar Python com FastAPI. |
+| RNF03 | O frontend deverá utilizar Next.js com TypeScript. |
+| RNF04 | O banco de dados deverá utilizar PostgreSQL. |
+| RNF05 | A API deverá disponibilizar documentação Swagger/OpenAPI. |
+| RNF06 | O ambiente de desenvolvimento deverá utilizar Docker e Docker Compose. |
+| RNF07 | O sistema deverá possuir testes automatizados utilizando pytest e Playwright. |
+| RNF08 | O projeto deverá utilizar GitHub para versionamento, com branches e Pull Requests. |
+| RNF09 | O pipeline CI/CD deverá utilizar GitHub Actions para executar verificações automatizadas. |
+
+Esses requisitos representam o estado esperado para a Entrega 5. O RNF04 depende da configuração do PostgreSQL, pois o ambiente local e o backend no Docker Compose utilizam SQLite por padrão. Há testes pytest e Vitest no repositório, mas não foi identificada configuração de testes Playwright. O RNF09 permanece pendente: a configuração de CI/CD versionada utiliza Jenkins, conforme a seção da Entrega 4; não há workflows do GitHub Actions no repositório.
+
+## 🔄 Metodologia Ágil — Kanban
+
+O grupo utiliza a metodologia Kanban por meio do GitHub Projects para organizar e acompanhar as atividades. O quadro permite acompanhar o progresso do desenvolvimento nas seguintes colunas:
+
+| Coluna | Descrição |
+| --- | --- |
+| **Todo** | Atividades planejadas e ainda não iniciadas. |
+| **In Progress** | Atividades em desenvolvimento. |
+| **Done** | Atividades concluídas. |
+
+As funcionalidades são organizadas em histórias de usuário, cadastradas como issues e organizadas no GitHub Projects. Cada história deve conter título, descrição, critérios de aceite e responsável. Cada integrante deve criar pelo menos uma história de usuário, e o projeto deve possuir pelo menos cinco histórias.
+
+A equipe utiliza branches e Pull Requests para organizar as alterações no código, seguindo as regras da seção “Fluxo de trabalho”. A criação das issues, a participação de cada integrante e a organização do quadro devem ser comprovadas no GitHub; esta documentação não atesta a conclusão dessas atividades.
+
+---
+
 ## Tecnologias
 
 ### Frontend
 
-* Next.js
-* React
+* Next.js (React)
 * TypeScript
 * Tailwind CSS
 * shadcn/ui
@@ -55,13 +101,14 @@ Funcionalidades previstas:
 
 * Vitest
 * pytest
-* Playwright
-* Postman
+* Playwright (previsto; sem configuração identificada no repositório)
+* Postman (previsto para testes manuais)
 
 ### DevOps
 
 * Git e GitHub
-* Jenkins
+* Jenkins (configuração versionada da Entrega 4)
+* GitHub Actions (requisito da Entrega 5; implementação pendente)
 * Docker e Docker Compose
 * Vercel
 
@@ -69,7 +116,7 @@ Funcionalidades previstas:
 
 ## Arquitetura
 
-O sistema é dividido em duas aplicações independentes que conversam por HTTP/JSON. O frontend não acessa o banco diretamente: tudo passa pela API.
+A arquitetura prevista divide o sistema em duas aplicações independentes que se comunicam por HTTP/JSON. Nesse fluxo, o frontend acessa os dados pela API, sem acessar diretamente o banco. Atualmente, o frontend mantém as despesas no `localStorage`, enquanto a API possui persistência própria; a integração entre essas partes ainda está pendente. Os diagramas abaixo representam a arquitetura e o fluxo esperados.
 
 ```mermaid
 flowchart LR
@@ -126,15 +173,15 @@ O FastAPI gera a documentação a partir do próprio código, então ela não de
 | `/docs`         | Swagger UI, permite testar os endpoints no navegador |
 | `/openapi.json` | Contrato da API em JSON                          |
 
-Endpoints previstos:
+Endpoints implementados em `backend/src/main.py` e endpoint planejado:
 
-| Método   | Rota             | Descrição            |
-| -------- | ---------------- | -------------------- |
-| `GET`    | `/despesas`      | Lista as despesas    |
-| `POST`   | `/despesas`      | Cadastra uma despesa |
-| `PUT`    | `/despesas/{id}` | Edita uma despesa    |
-| `DELETE` | `/despesas/{id}` | Exclui uma despesa   |
-| `GET`    | `/categorias`    | Lista as categorias  |
+| Método | Rota | Descrição | Situação |
+| --- | --- | --- | --- |
+| `GET` | `/despesas` | Lista as despesas | Implementado |
+| `POST` | `/despesas` | Cadastra uma despesa | Implementado |
+| `PUT` | `/despesas/{id}` | Edita uma despesa | Implementado |
+| `DELETE` | `/despesas/{id}` | Exclui uma despesa | Implementado |
+| `GET` | `/categorias` | Lista as categorias | Planejado |
 
 ---
 
@@ -179,6 +226,8 @@ Sistema-de-Gestao-Despesas/
 | Ponta a ponta       | Playwright               | Fluxos completos no navegador        |
 | Exploratório        | Postman                  | Testes manuais e demonstração        |
 
+As linhas de Playwright e Postman representam o escopo previsto, sem evidência de execução no repositório. A existência dos testes Vitest e pytest também não comprova sua execução bem-sucedida.
+
 O `TestClient` do FastAPI usa httpx por baixo, então os testes de integração batem nos endpoints de verdade sem precisar subir um servidor. A collection do Postman deve ser importada do `/openapi.json`, para não ser mantida à mão quando a API mudar.
 
 Rodando os testes do frontend:
@@ -213,7 +262,7 @@ pip install -r requirements.txt
 pytest
 ```
 
-Funcionalidades já cobertas:
+Funcionalidades contempladas nos arquivos de testes existentes (a presença dos testes não comprova aprovação ou cobertura medida):
 
 * Validação de valores de despesas;
 * Cadastro de despesas (unitário e de componente);
@@ -311,16 +360,27 @@ git commit -m "docs: atualiza documentação"
 
 ## Requisitos da Entrega 4
 
+Os itens marcados abaixo indicam configuração presente no repositório, sem comprovar execução no Jenkins, publicação de relatórios ou deploy bem-sucedido.
+
 * [x] Pipeline Jenkins com Build, Testes e Deploy;
 * [x] Cinco jobs independentes;
 * [ ] Definir e comprovar pelo menos um job por integrante;
 * [x] Relatórios JUnit e cobertura HTML/XML no frontend e backend;
-* [x] Publicação dos relatórios e artefatos no Jenkins;
-* [x] Deploy da `main` com Docker Compose e healthchecks;
+* [ ] Publicação dos relatórios e artefatos no Jenkins (configurada; execução e evidências pendentes);
+* [ ] Deploy da `main` com Docker Compose e healthchecks (configurado; execução e evidências pendentes);
 * [ ] Configurar a instância Jenkins e executar o pipeline completo;
 * [ ] Registrar evidências da execução e das coberturas;
 * [ ] Obter duas aprovações no PR;
 * [ ] Líder enviar o link do repositório até **17/10/2026 às 23:59**.
+
+## Requisitos da Entrega 5
+
+* [x] Documentar os requisitos funcionais RF01 a RF08;
+* [x] Documentar os requisitos não funcionais RNF01 a RNF09;
+* [x] Documentar a metodologia Kanban e as colunas do GitHub Projects;
+* [ ] Comprovar pelo menos cinco histórias de usuário, com pelo menos uma por integrante;
+* [ ] Comprovar título, descrição, critérios de aceite e responsável em cada história;
+* [ ] Comprovar a organização das issues no quadro Kanban do GitHub Projects.
 
 ## Status
 
