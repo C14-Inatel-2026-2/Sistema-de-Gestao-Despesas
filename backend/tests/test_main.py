@@ -40,6 +40,15 @@ def client():
     app.dependency_overrides.clear()
 
 
+def test_health_retorna_ok(client: TestClient) -> None:
+    # O healthcheck do Docker Compose e o smoke test do Jenkins dependem
+    # deste endpoint.
+    resposta = client.get("/health")
+
+    assert resposta.status_code == 200
+    assert resposta.json() == {"status": "ok"}
+
+
 def test_criar_despesa_valida(client: TestClient) -> None:
     resposta = client.post(
         "/despesas",
