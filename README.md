@@ -54,7 +54,7 @@ Funcionalidades previstas:
 | RNF04 | O banco de dados de produção deverá ser PostgreSQL. | Parcial: a API lê `DATABASE_URL` e inclui o driver, mas o padrão local e o Docker Compose usam SQLite |
 | RNF05 | A API deverá disponibilizar documentação Swagger/OpenAPI. | Atendido (`/docs` e `/openapi.json`) |
 | RNF06 | O ambiente deverá poder ser executado com Docker e Docker Compose. | Atendido |
-| RNF07 | O sistema deverá possuir testes automatizados com pytest (backend) e Vitest (frontend). | Atendido: 21 testes pytest e 65 Vitest |
+| RNF07 | O sistema deverá possuir testes automatizados com pytest (backend) e Vitest (frontend). | Atendido: 22 testes pytest e 65 Vitest |
 | RNF08 | O projeto deverá utilizar GitHub para versionamento, com branches e Pull Requests. | Atendido |
 | RNF09 | O pipeline CI/CD deverá utilizar Jenkins para executar verificações automatizadas. | Parcial: pipeline versionado; execução na instância Jenkins pendente |
 | RNF10 | Os dados deverão ser validados no frontend e na API: valor maior que zero, data não futura e categoria existente. | Parcial: o frontend valida tudo; a API valida valor e descrição |
@@ -248,7 +248,7 @@ Sistema-de-Gestao-Despesas/
 | Integração (API)    | pytest + `TestClient`    | Endpoints reais, requisição/resposta |
 | Exploratório        | Postman                  | Testes manuais e demonstração        |
 
-Atualmente há 65 testes Vitest e 21 testes pytest, todos passando. Testes ponta a ponta no navegador não fazem parte do escopo atual.
+Atualmente há 65 testes Vitest e 22 testes pytest, todos passando. Testes ponta a ponta no navegador não fazem parte do escopo atual.
 
 O `TestClient` do FastAPI usa httpx por baixo, então os testes de integração batem nos endpoints de verdade sem precisar subir um servidor. A collection do Postman deve ser importada do `/openapi.json`, para não ser mantida à mão quando a API mudar.
 
