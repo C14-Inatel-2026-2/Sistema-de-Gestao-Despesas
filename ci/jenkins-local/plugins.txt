@@ -1,0 +1,10 @@
+workflow-aggregator
+git
+junit
+htmlpublisher
+job-dsl
+configuration-as-code
+timestamper
+pipeline-stage-view
+branch-api
+workflow-multibranch
