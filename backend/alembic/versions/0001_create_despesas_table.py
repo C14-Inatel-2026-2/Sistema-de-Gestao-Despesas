@@ -28,6 +28,7 @@ def upgrade() -> None:
         sa.Column(
             "criado_em",
             sa.DateTime(timezone=True),
+            nullable=False,
             server_default=sa.text("CURRENT_TIMESTAMP"),
         ),
     )
