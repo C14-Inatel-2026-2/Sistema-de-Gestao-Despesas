@@ -336,7 +336,7 @@ Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o
 
 Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes. O job `cobertura-minima` exige pelo menos 80% de cobertura de linhas e statements no frontend e no backend; abaixo disso o pipeline falha antes do build.
 
-O roteiro de instalação, execução, evidências e limitações está em [docs/ci-cd.md](docs/ci-cd.md).
+O roteiro de instalação, execução, evidências e limitações está em [docs/ci-cd.md](docs/ci-cd.md). Para rodar o pipeline na própria máquina, com Docker, use o [Jenkins local](ci/jenkins-local/README.md).
 
 ---
 
