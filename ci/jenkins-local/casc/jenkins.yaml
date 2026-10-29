@@ -1,0 +1,22 @@
+jenkins:
+  systemMessage: "Jenkins local - Sistema de Gestão de Despesas"
+  numExecutors: 4
+  # Label exigido pelos Jenkinsfiles: um único agente com Docker.
+  labelString: "despesas-docker"
+  globalNodeProperties:
+    - envVars:
+        env:
+          # Evita conflito com outros serviços locais nas portas 3000 e 8000.
+          - key: FRONTEND_PORT
+            value: "3100"
+          - key: BACKEND_PORT
+            value: "8100"
+security:
+  globalJobDslSecurityConfiguration:
+    useScriptSecurity: false
+unclassified:
+  location:
+    url: http://localhost:8080/
+jobs:
+  - file: /jobs/jobs.groovy
+  - file: /jobs/multibranch.groovy

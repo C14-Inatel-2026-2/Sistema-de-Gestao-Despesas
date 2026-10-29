@@ -1,0 +1,21 @@
+# Jenkins local para rodar o pipeline da Entrega 4.
+# Uso: veja o README.md desta pasta.
+services:
+  jenkins:
+    build: .
+    user: root
+    ports:
+      - "127.0.0.1:8080:8080"
+    environment:
+      # O JENKINS_HOME precisa ter o mesmo caminho no host e no container:
+      # os jobs fazem `docker run -v $PWD/...`, e quem resolve o caminho é o
+      # daemon Docker do host.
+      JENKINS_HOME: ${JENKINS_HOME_DIR:?defina JENKINS_HOME_DIR}
+      CASC_JENKINS_CONFIG: /casc
+      JAVA_OPTS: -Djenkins.install.runSetupWizard=false
+    volumes:
+      - ${JENKINS_HOME_DIR}:${JENKINS_HOME_DIR}
+      - /var/run/docker.sock:/var/run/docker.sock
+      - ./casc:/casc:ro
+      - ../jobs.groovy:/jobs/jobs.groovy:ro
+      - ./casc/multibranch.groovy:/jobs/multibranch.groovy:ro
