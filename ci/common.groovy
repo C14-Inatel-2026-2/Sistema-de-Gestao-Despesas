@@ -15,6 +15,8 @@ set -eu
 docker run --rm --user "$(id -u):$(id -g)" \
   -e HOME=/tmp -e COREPACK_HOME=/tmp/corepack \
   -e COREPACK_ENABLE_DOWNLOAD_PROMPT=0 -e CI=true -e CI_COMMAND \
+  -e pnpm_config_fetch_timeout=300000 -e pnpm_config_fetch_retries=5 \
+  -e pnpm_config_network_concurrency=8 \
   -v "$PWD/frontend:/app" -w /app node:22-alpine \
   sh -ec 'corepack pnpm install --frozen-lockfile && eval "$CI_COMMAND"'
 '''
