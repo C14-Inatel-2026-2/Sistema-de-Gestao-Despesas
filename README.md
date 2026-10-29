@@ -59,7 +59,7 @@ Funcionalidades previstas:
 | RNF09 | O pipeline CI/CD deverá utilizar Jenkins para executar verificações automatizadas. | Parcial: pipeline versionado; execução na instância Jenkins pendente |
 | RNF10 | Os dados deverão ser validados no frontend e na API: valor maior que zero, data não futura e categoria existente. | Parcial: o frontend valida tudo; a API valida valor e descrição |
 | RNF11 | A API deverá seguir o padrão REST com JSON. | Atendido |
-| RNF12 | O código deverá possuir pelo menos 80% de cobertura de testes no frontend e no backend. | Atendido: ~86% no frontend e 85% no backend; o job `cobertura-minima` exige 80% |
+| RNF12 | O código deverá possuir pelo menos 80% de cobertura de testes no frontend e no backend. | Atendido: 85,84% de linhas no frontend e 86% no backend; o job `cobertura-minima` exige 80% |
 | RNF13 | Toda alteração deverá passar por Pull Request com duas aprovações e pelas verificações do pipeline Jenkins. | Regra do grupo, descrita em [Fluxo de trabalho](#fluxo-de-trabalho) |
 | RNF14 | A aplicação deverá iniciar com Docker Compose, sem instalação manual das dependências no host. | Atendido |
 | RNF15 | As mudanças no banco deverão ser versionadas com Alembic. | Atendido |
