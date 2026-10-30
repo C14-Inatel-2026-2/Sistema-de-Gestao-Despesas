@@ -31,45 +31,39 @@ Funcionalidades previstas:
 
 ## 📋 Requisitos Funcionais
 
-Os requisitos a seguir definem o escopo esperado, sem indicar conclusão da implementação.
-
-| Código | Requisito | Situação |
-| --- | --- | --- |
-| RF01 | Permitir cadastrar despesas com valor, descrição, categoria e data. | Implementado no frontend local e na API |
-| RF02 | Permitir editar despesas cadastradas. | Implementado apenas na API; interface pendente |
-| RF03 | Permitir excluir despesas. | Implementado no frontend local e na API |
-| RF04 | Listar todas as despesas cadastradas. | Implementado no frontend local e na API |
-| RF05 | Permitir categorizar despesas em Alimentação, Transporte, Moradia, Saúde, Educação, Lazer ou Outros. | Implementado no frontend |
-| RF06 | Permitir filtrar despesas por período e categoria. | Implementado no frontend local |
-| RF07 | Calcular e apresentar o valor total das despesas e o total por categoria. | Implementado no frontend local |
-| RF08 | Disponibilizar um dashboard com gráficos para acompanhamento dos gastos. | Pendente |
-| RF09 | Manter as despesas salvas no servidor por meio da API e do PostgreSQL. | Integração pendente |
-| RF10 | Listar as categorias na API pelo endpoint `GET /categorias`. | Pendente |
-
-O frontend mantém atualmente as despesas no `localStorage`; a integração com o servidor corresponde ao RF09. A situação indica presença de implementação no código, sem comprovar validação completa dos critérios de aceite.
+| Código | Requisito | História | Situação |
+| --- | --- | --- | --- |
+| RF01 | Permitir cadastrar despesas com valor, descrição, categoria e data. | US01 | Implementado (frontend e API) |
+| RF02 | Permitir editar despesas cadastradas. | US03 | API pronta; tela de edição pendente |
+| RF03 | Permitir excluir despesas. | US04 | Implementado (frontend e API) |
+| RF04 | Listar todas as despesas cadastradas. | US02 | Implementado (frontend e API) |
+| RF05 | Permitir categorizar despesas em Alimentação, Transporte, Moradia, Saúde, Educação, Lazer ou Outros. | US01 | Implementado no frontend |
+| RF06 | Permitir filtrar despesas por período e categoria. | US05 | Implementado no frontend |
+| RF07 | Calcular e apresentar o valor total das despesas e o total por categoria. | US02 | Implementado no frontend |
+| RF08 | Disponibilizar um dashboard com gráficos para acompanhamento dos gastos. | US07 | Pendente |
+| RF09 | Manter as despesas salvas no servidor por meio da API e do PostgreSQL. | US08 | Pendente: o frontend ainda usa `localStorage` |
+| RF10 | Listar as categorias na API pelo endpoint `GET /categorias`. | US08 | Pendente |
 
 ## ⚙️ Requisitos Não Funcionais
 
-| Código | Requisito |
-| --- | --- |
-| RNF01 | A interface deverá ser responsiva para computadores, tablets e celulares. |
-| RNF02 | O backend deverá utilizar Python com FastAPI. |
-| RNF03 | O frontend deverá utilizar Next.js com TypeScript. |
-| RNF04 | O banco de dados deverá utilizar PostgreSQL. |
-| RNF05 | A API deverá disponibilizar documentação Swagger/OpenAPI. |
-| RNF06 | O ambiente de desenvolvimento deverá utilizar Docker e Docker Compose. |
-| RNF07 | O sistema deverá possuir testes automatizados utilizando pytest e Playwright. |
-| RNF08 | O projeto deverá utilizar GitHub para versionamento, com branches e Pull Requests. |
-| RNF09 | O pipeline CI/CD deverá utilizar GitHub Actions para executar verificações automatizadas. |
-| RNF10 | Os dados deverão ser validados no frontend e na API: valor maior que zero, data não futura e categoria existente. |
-| RNF11 | A API deverá seguir o padrão REST com JSON. |
-| RNF12 | O código deverá possuir pelo menos 80% de cobertura de testes no frontend e no backend. |
-| RNF13 | Toda alteração deverá passar por Pull Request com duas aprovações e pelas verificações do pipeline Jenkins existente. |
-| RNF14 | A aplicação deverá iniciar com Docker Compose, sem instalação manual das dependências das aplicações no host. |
-| RNF15 | As mudanças no banco deverão ser versionadas com Alembic. |
-| RNF16 | Os valores deverão ser exibidos em reais (R$). |
-
-Esses requisitos representam o estado esperado para a Entrega 5. O RNF04 depende da configuração do PostgreSQL, pois o ambiente local e o backend no Docker Compose utilizam SQLite por padrão. Há testes pytest e Vitest no repositório, mas não foi identificada configuração de testes Playwright. O RNF09 permanece pendente: a configuração de CI/CD versionada utiliza Jenkins, conforme a seção da Entrega 4; não há workflows do GitHub Actions no repositório.
+| Código | Requisito | Situação |
+| --- | --- | --- |
+| RNF01 | A interface deverá ser responsiva para computadores, tablets e celulares. | Atendido (Tailwind, breakpoints `sm`/`md`/`lg`) |
+| RNF02 | O backend deverá utilizar Python com FastAPI. | Atendido |
+| RNF03 | O frontend deverá utilizar Next.js com TypeScript. | Atendido |
+| RNF04 | O banco de dados de produção deverá ser PostgreSQL. | Parcial: a API lê `DATABASE_URL` e inclui o driver, mas o padrão local e o Docker Compose usam SQLite |
+| RNF05 | A API deverá disponibilizar documentação Swagger/OpenAPI. | Atendido (`/docs` e `/openapi.json`) |
+| RNF06 | O ambiente deverá poder ser executado com Docker e Docker Compose. | Atendido |
+| RNF07 | O sistema deverá possuir testes automatizados com pytest (backend) e Vitest (frontend). | Atendido: 22 testes pytest e 65 Vitest |
+| RNF08 | O projeto deverá utilizar GitHub para versionamento, com branches e Pull Requests. | Atendido |
+| RNF09 | O pipeline CI/CD deverá utilizar Jenkins para executar verificações automatizadas. | Parcial: pipeline versionado; execução na instância Jenkins pendente |
+| RNF10 | Os dados deverão ser validados no frontend e na API: valor maior que zero, data não futura e categoria existente. | Parcial: o frontend valida tudo; a API valida valor e descrição |
+| RNF11 | A API deverá seguir o padrão REST com JSON. | Atendido |
+| RNF12 | O código deverá possuir pelo menos 80% de cobertura de testes no frontend e no backend. | Atendido: 85,84% de linhas no frontend e 86% no backend; o job `cobertura-minima` exige 80% |
+| RNF13 | Toda alteração deverá passar por Pull Request com duas aprovações e pelas verificações do pipeline Jenkins. | Regra do grupo, descrita em [Fluxo de trabalho](#fluxo-de-trabalho) |
+| RNF14 | A aplicação deverá iniciar com Docker Compose, sem instalação manual das dependências no host. | Atendido |
+| RNF15 | As mudanças no banco deverão ser versionadas com Alembic. | Atendido |
+| RNF16 | Os valores deverão ser exibidos em reais (R$). | Atendido |
 
 ## 🔄 Metodologia Ágil — Kanban
 
@@ -81,14 +75,29 @@ O grupo utiliza a metodologia Kanban por meio do [GitHub Projects — quadro do 
 | **In Progress** | Atividades em desenvolvimento. |
 | **Done** | Atividades concluídas. |
 
-As funcionalidades são organizadas em histórias de usuário, cadastradas como issues e organizadas no GitHub Projects. Cada história deve conter título, descrição, critérios de aceite e responsável. Cada integrante deve criar pelo menos uma história de usuário, e o projeto deve possuir pelo menos cinco histórias.
+As funcionalidades são organizadas em histórias de usuário, cadastradas como issues com o label `user-story` e organizadas no quadro. Cada história segue o formato “Como… quero… para…”, com critérios de aceite em checklist e um responsável. Tarefas técnicas, como jobs de CI e testes, são issues comuns, identificadas pelos labels `devops`, `test`, `frontend` e `backend`. As alterações no código seguem as regras da seção [Fluxo de trabalho](#fluxo-de-trabalho).
 
-A equipe utiliza branches e Pull Requests para organizar as alterações no código, seguindo as regras da seção “Fluxo de trabalho”. A criação das issues, a participação de cada integrante e a organização do quadro devem ser comprovadas no GitHub; esta documentação não atesta a conclusão dessas atividades.
+### Histórias de usuário
 
+| História | Responsável | Requisitos | Situação |
+| --- | --- | --- | --- |
+| [US01 — Cadastrar despesa](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/26) | André Dias Balbino | RF01, RF05 | Done |
+| [US02 — Listar despesas, total e resumo por categoria](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/27) | Gabriel Gazotti | RF04, RF07 | Done |
+| [US03 — Editar despesa](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/28) | André Dias Balbino | RF02 | Todo |
+| [US04 — Excluir despesa](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/29) | João Victor Siécola Souza | RF03 | Done |
+| [US05 — Filtrar despesas por período e categoria](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/30) | Marco Di Toro | RF06 | Done |
+| [US06 — Acessar o sistema online sempre atualizado](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/31) | Paulo Vicente | RNF09 | In Progress |
+| [US07 — Visualizar dashboard de gastos](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/32) | Marco Di Toro | RF08 | Todo |
+| [US08 — Manter as despesas salvas no servidor](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/33) | João Victor Siécola Souza | RF09, RF10 | Todo |
+| [US09 — Consultar a documentação do projeto](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/35) | Paulo Vicente | — | Done |
 
-As histórias devem utilizar o formato “Como… quero… para…” e o label `user-story`, com critérios de aceite em checklist. Tarefas técnicas, como jobs de CI, são registradas como issues comuns. Cada issue deve ter um responsável e, quando envolver implementação no repositório, ser vinculada ao Pull Request que a conclui.
+Exemplo de história com critérios de aceite (US04):
 
-Os códigos RF e RNF foram consolidados nesta revisão: RF01–RF08 e RNF01–RNF09 seguem a numeração da Entrega 5; os requisitos adicionais da documentação anterior foram preservados como RF09–RF10 e RNF10–RNF16. Referências antigas devem ser conferidas pelo conteúdo do requisito.
+> **Como** usuário, **quero** excluir uma despesa, **para** remover um registro lançado por engano.
+>
+> * [x] Cada despesa da lista tem uma ação de excluir.
+> * [x] Após excluir, a despesa some da lista e o total é recalculado.
+> * [x] A API responde 204 ao excluir e 404 se a despesa não existir.
 
 ---
 
@@ -117,14 +126,12 @@ Os códigos RF e RNF foram consolidados nesta revisão: RF01–RF08 e RNF01–RN
 
 * Vitest
 * pytest
-* Playwright (previsto; sem configuração identificada no repositório)
-* Postman (previsto para testes manuais)
+* Postman (testes manuais da API, a partir do `/openapi.json`)
 
 ### DevOps
 
 * Git e GitHub
-* Jenkins (configuração versionada da Entrega 4)
-* GitHub Actions (requisito da Entrega 5; implementação pendente)
+* Jenkins (pipeline versionado da Entrega 4)
 * Docker e Docker Compose
 * Vercel
 
@@ -239,10 +246,9 @@ Sistema-de-Gestao-Despesas/
 | Unitário (frontend) | Vitest + Testing Library | Regras de negócio e componentes      |
 | Unitário (backend)  | pytest                   | Validações e regras da API           |
 | Integração (API)    | pytest + `TestClient`    | Endpoints reais, requisição/resposta |
-| Ponta a ponta       | Playwright               | Fluxos completos no navegador        |
 | Exploratório        | Postman                  | Testes manuais e demonstração        |
 
-As linhas de Playwright e Postman representam o escopo previsto, sem evidência de execução no repositório. A existência dos testes Vitest e pytest também não comprova sua execução bem-sucedida.
+Atualmente há 65 testes Vitest e 22 testes pytest, todos passando. Testes ponta a ponta no navegador não fazem parte do escopo atual.
 
 O `TestClient` do FastAPI usa httpx por baixo, então os testes de integração batem nos endpoints de verdade sem precisar subir um servidor. A collection do Postman deve ser importada do `/openapi.json`, para não ser mantida à mão quando a API mudar.
 
@@ -278,7 +284,7 @@ pip install -r requirements.txt
 pytest
 ```
 
-Funcionalidades contempladas nos arquivos de testes existentes (a presença dos testes não comprova aprovação ou cobertura medida):
+Funcionalidades cobertas pelos testes:
 
 * Validação de valores de despesas;
 * Cadastro de despesas (unitário e de componente);
@@ -291,13 +297,14 @@ Funcionalidades contempladas nos arquivos de testes existentes (a presença dos 
 
 ## Pipeline de CI/CD — Entrega 4
 
-O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena oito jobs independentes, definidos em `ci/`:
+O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena dez jobs independentes, definidos em `ci/`:
 
 | Job | Responsável | Resultado |
 | --- | --- | --- |
 | `despesas/qualidade` | Paulo Vicente | ESLint, TypeScript e Ruff |
 | `despesas/testes-frontend` | Paulo Vicente | Vitest, JUnit e cobertura HTML/XML |
 | `despesas/testes-backend` | Paulo Vicente | pytest, JUnit e cobertura HTML/XML |
+| `despesas/migracoes` | André Dias Balbino | Aplica as migrações Alembic em um banco limpo |
 | `despesas/cobertura-minima` | Gabriel Gazotti | Vitest e pytest-cov com mínimo de 80% de cobertura; falha o pipeline abaixo disso |
 | `despesas/auditoria` | João Victor Siécola Souza | `pnpm audit` e `pip-audit` sobre as dependências, sem bloquear o pipeline |
 | `despesas/lint-docker` | Marco Di Toro | hadolint nos Dockerfiles e validação do `docker-compose.yml` |
@@ -305,15 +312,17 @@ O pipeline usa **Jenkins**, sem GitHub Actions. O `Jenkinsfile` coordena oito jo
 | `despesas/deploy` | Paulo Vicente | Deploy com healthchecks e volume persistente |
 | `despesas/smoke-test` | João Victor Siécola Souza | Chamadas HTTP reais ao frontend e à API após o deploy |
 
-Para atender ao requisito de pelo menos um job por integrante, André Dias Balbino e Gabriel Gazotti ainda devem definir e comprovar suas próprias contribuições.
+Cada integrante é responsável por pelo menos um job.
 
 ```mermaid
 flowchart LR
     A[Push / PR] --> B[Qualidade]
     B --> C[Testes frontend]
     B --> D[Testes backend]
+    B --> G2[Migrações]
     C --> M[Cobertura mínima]
     D --> M
+    G2 --> M
     M --> X[Auditoria de dependências]
     X --> L[Lint Docker]
     L --> E[Build das imagens]
@@ -327,7 +336,7 @@ Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o
 
 Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes. O job `cobertura-minima` exige pelo menos 80% de cobertura de linhas e statements no frontend e no backend; abaixo disso o pipeline falha antes do build.
 
-O roteiro de instalação, execução, evidências e limitações está em [docs/ci-cd.md](docs/ci-cd.md).
+O roteiro de instalação, execução, evidências e limitações está em [docs/ci-cd.md](docs/ci-cd.md). Para rodar o pipeline na própria máquina, com Docker, use o [Jenkins local](ci/jenkins-local/README.md).
 
 ---
 
@@ -375,37 +384,28 @@ git commit -m "docs: atualiza documentação"
 * [x] Desenvolver pelo menos uma pequena funcionalidade testável;
 * [x] Criar `requirements.txt`;
 * [x] Criar `package.json`;
-* [ ] Cada integrante realizar pelo menos 1 commit;
-* [ ] Cada alteração ser enviada através de Pull Request;
-* [ ] Pull Requests serem aprovados por outro integrante;
+* [x] Cada integrante realizar pelo menos 1 commit;
+* [x] Cada alteração ser enviada através de Pull Request;
 * [x] Configurar CI/CD inicial.
-
----
 
 ## Requisitos da Entrega 4
 
-Os itens marcados abaixo indicam configuração presente no repositório, sem comprovar execução no Jenkins, publicação de relatórios ou deploy bem-sucedido.
-
 * [x] Pipeline Jenkins com Build, Testes e Deploy;
-* [x] Oito jobs independentes;
-* [ ] Definir e comprovar pelo menos um job por integrante;
+* [x] Dez jobs independentes;
+* [x] Pelo menos um job por integrante;
 * [x] Relatórios JUnit e cobertura HTML/XML no frontend e backend;
-* [ ] Publicação dos relatórios e artefatos no Jenkins (configurada; execução e evidências pendentes);
-* [ ] Deploy da `main` com Docker Compose e healthchecks (configurado; execução e evidências pendentes);
 * [ ] Configurar a instância Jenkins e executar o pipeline completo;
-* [ ] Registrar evidências da execução e das coberturas;
-* [ ] Obter duas aprovações no PR;
-* [ ] Líder enviar o link do repositório até **17/10/2026 às 23:59**.
+* [ ] Registrar evidências da execução, da cobertura e do deploy.
 
 ## Requisitos da Entrega 5
 
-* [x] Documentar os requisitos funcionais RF01 a RF08;
-* [x] Documentar os requisitos não funcionais RNF01 a RNF09;
-* [x] Documentar a metodologia Kanban e as colunas do GitHub Projects;
-* [ ] Comprovar pelo menos cinco histórias de usuário, com pelo menos uma por integrante;
-* [ ] Comprovar título, descrição, critérios de aceite e responsável em cada história;
-* [ ] Comprovar a organização das issues no quadro Kanban do GitHub Projects.
+* [x] Documentar os requisitos funcionais RF01 a RF10;
+* [x] Documentar os requisitos não funcionais RNF01 a RNF16;
+* [x] Organizar o projeto com Kanban no GitHub Projects;
+* [x] Cadastrar pelo menos cinco histórias de usuário, com pelo menos uma por integrante (nove histórias, US01 a US09);
+* [x] Descrever título, história, critérios de aceite e responsável em cada história;
+* [x] Manter as issues organizadas no quadro Kanban.
 
 ## Status
 
-Em desenvolvimento. A configuração da Entrega 4 está versionada; a validação completa no Jenkins e as evidências da execução devem ser concluídas antes do envio.
+Em desenvolvimento. O frontend está publicado na Vercel e a API possui CRUD de despesas. Falta integrar o frontend à API (US08), criar a tela de edição (US03) e o dashboard (US07), além de executar o pipeline na instância Jenkins e registrar as evidências (US06).
