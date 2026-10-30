@@ -5,6 +5,7 @@ import { ExpenseFiltersBar } from "@/components/ExpenseFilters";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { ExpenseList } from "@/components/ExpenseList";
 import { ExpenseSummary } from "@/components/ExpenseSummary";
+import { ExportCsvButton } from "@/components/ExportCsvButton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExpenses } from "@/hooks/useExpenses";
 import { filterExpenses } from "@/lib/expenses";
@@ -45,11 +46,16 @@ export default function Home() {
             </CardContent>
           </Card>
 
-          <ExpenseList
-            expenses={visible}
-            totalCount={expenses.length}
-            onDelete={removeExpense}
-          />
+          <div className="space-y-3">
+            <div className="flex justify-end">
+              <ExportCsvButton expenses={visible} />
+            </div>
+            <ExpenseList
+              expenses={visible}
+              totalCount={expenses.length}
+              onDelete={removeExpense}
+            />
+          </div>
         </section>
       </div>
     </main>

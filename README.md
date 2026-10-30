@@ -24,6 +24,7 @@ Funcionalidades previstas:
 * Categorização de gastos;
 * Filtros por período e categoria;
 * Visualização do total de despesas;
+* Exportação das despesas em CSV;
 * Dashboard para acompanhamento;
 * Interface responsiva.
 
@@ -43,6 +44,7 @@ Funcionalidades previstas:
 | RF08 | Disponibilizar um dashboard com gráficos para acompanhamento dos gastos. | US07 | Pendente |
 | RF09 | Manter as despesas salvas no servidor por meio da API e do PostgreSQL. | US08 | Pendente: o frontend ainda usa `localStorage` |
 | RF10 | Listar as categorias na API pelo endpoint `GET /categorias`. | US08 | Pendente |
+| RF11 | Permitir exportar as despesas exibidas, respeitando os filtros aplicados, em um arquivo CSV. | US10 | Implementado no frontend |
 
 ## ⚙️ Requisitos Não Funcionais
 
@@ -54,7 +56,7 @@ Funcionalidades previstas:
 | RNF04 | O banco de dados de produção deverá ser PostgreSQL. | Parcial: a API lê `DATABASE_URL` e inclui o driver, mas o padrão local e o Docker Compose usam SQLite |
 | RNF05 | A API deverá disponibilizar documentação Swagger/OpenAPI. | Atendido (`/docs` e `/openapi.json`) |
 | RNF06 | O ambiente deverá poder ser executado com Docker e Docker Compose. | Atendido |
-| RNF07 | O sistema deverá possuir testes automatizados com pytest (backend) e Vitest (frontend). | Atendido: 22 testes pytest e 65 Vitest |
+| RNF07 | O sistema deverá possuir testes automatizados com pytest (backend) e Vitest (frontend). | Atendido: 22 testes pytest e 74 Vitest |
 | RNF08 | O projeto deverá utilizar GitHub para versionamento, com branches e Pull Requests. | Atendido |
 | RNF09 | O pipeline CI/CD deverá utilizar Jenkins para executar verificações automatizadas. | Parcial: pipeline versionado; execução na instância Jenkins pendente |
 | RNF10 | Os dados deverão ser validados no frontend e na API: valor maior que zero, data não futura e categoria existente. | Parcial: o frontend valida tudo; a API valida valor e descrição |
@@ -90,6 +92,7 @@ As funcionalidades são organizadas em histórias de usuário, cadastradas como 
 | [US07 — Visualizar dashboard de gastos](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/32) | Marco Di Toro | RF08 | Todo |
 | [US08 — Manter as despesas salvas no servidor](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/33) | João Victor Siécola Souza | RF09, RF10 | Todo |
 | [US09 — Consultar a documentação do projeto](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/35) | Paulo Vicente | — | Done |
+| [US10 — Exportar despesas em CSV](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/45) | João Victor Siécola Souza | RF11 | Done |
 
 Exemplo de história com critérios de aceite (US04):
 
@@ -248,7 +251,7 @@ Sistema-de-Gestao-Despesas/
 | Integração (API)    | pytest + `TestClient`    | Endpoints reais, requisição/resposta |
 | Exploratório        | Postman                  | Testes manuais e demonstração        |
 
-Atualmente há 65 testes Vitest e 22 testes pytest, todos passando. Testes ponta a ponta no navegador não fazem parte do escopo atual.
+Atualmente há 74 testes Vitest e 22 testes pytest, todos passando. Testes ponta a ponta no navegador não fazem parte do escopo atual.
 
 O `TestClient` do FastAPI usa httpx por baixo, então os testes de integração batem nos endpoints de verdade sem precisar subir um servidor. A collection do Postman deve ser importada do `/openapi.json`, para não ser mantida à mão quando a API mudar.
 
@@ -291,6 +294,7 @@ Funcionalidades cobertas pelos testes:
 * Listagem, exclusão e estados vazios (componente);
 * Cálculo do total de despesas e resumo por categoria (domínio e componente);
 * Filtro de despesas por categoria e por período (domínio e componente);
+* Exportação das despesas filtradas em CSV;
 * Mock inicial.
 
 ---
@@ -399,13 +403,13 @@ git commit -m "docs: atualiza documentação"
 
 ## Requisitos da Entrega 5
 
-* [x] Documentar os requisitos funcionais RF01 a RF10;
+* [x] Documentar os requisitos funcionais RF01 a RF11;
 * [x] Documentar os requisitos não funcionais RNF01 a RNF16;
 * [x] Organizar o projeto com Kanban no GitHub Projects;
-* [x] Cadastrar pelo menos cinco histórias de usuário, com pelo menos uma por integrante (nove histórias, US01 a US09);
+* [x] Cadastrar pelo menos cinco histórias de usuário, com pelo menos uma por integrante (dez histórias, US01 a US10);
 * [x] Descrever título, história, critérios de aceite e responsável em cada história;
 * [x] Manter as issues organizadas no quadro Kanban.
 
 ## Status
 
-Em desenvolvimento. O frontend está publicado na Vercel e a API possui CRUD de despesas. Falta integrar o frontend à API (US08), criar a tela de edição (US03) e o dashboard (US07), além de executar o pipeline na instância Jenkins e registrar as evidências (US06).
+Em desenvolvimento. O frontend está publicado na Vercel, permite exportar as despesas filtradas em CSV, e a API possui CRUD de despesas. Falta integrar o frontend à API (US08), criar a tela de edição (US03) e o dashboard (US07), além de executar o pipeline na instância Jenkins e registrar as evidências (US06).
