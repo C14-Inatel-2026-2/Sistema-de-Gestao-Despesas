@@ -1,7 +1,4 @@
-"""Ponto de entrada da API.
-
-PUT /despesas/{id} e DELETE /despesas/{id} ainda não estão aqui
-"""
+"""Ponto de entrada da API e operações de despesas."""
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy import select
@@ -17,6 +14,16 @@ from expenses import validar_despesa
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Sistema de Gestão de Despesas - API")
+
+
+def _validar_dados_despesa(despesa: schemas.DespesaBase) -> None:
+    """Converte os erros de negócio no formato HTTP usado pela API."""
+    erros = validar_despesa(despesa.valor, despesa.descricao)
+    if erros:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=[{"campo": e.campo, "mensagem": e.mensagem} for e in erros],
+        )
 
 
 @app.get("/health")
@@ -40,13 +47,7 @@ def criar_despesa(
     despesa: schemas.DespesaCreate, db: Session = Depends(get_db)
 ) -> models.Despesa:
     """Cadastra uma nova despesa, reaproveitando as regras de expenses.py."""
-    erros = validar_despesa(despesa.valor, despesa.descricao)
-    if erros:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=[{"campo": e.campo, "mensagem": e.mensagem} for e in erros],
-        )
-
+    _validar_dados_despesa(despesa)
     nova_despesa = models.Despesa(**despesa.model_dump())
     db.add(nova_despesa)
     db.commit()
@@ -66,12 +67,7 @@ def atualizar_despesa(
             detail=f"Despesa {despesa_id} não encontrada.",
         )
  
-    erros = validar_despesa(despesa.valor, despesa.descricao)
-    if erros:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=[{"campo": e.campo, "mensagem": e.mensagem} for e in erros],
-        )
+    _validar_dados_despesa(despesa)
  
     for campo, valor in despesa.model_dump().items():
         setattr(despesa_existente, campo, valor)
