@@ -1,17 +1,11 @@
 "use client";
 
 import { useId } from "react";
+import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { EXPENSE_CATEGORIES, type ExpenseFilters } from "@/types/expense";
+import { EMPTY_FILTERS, type ExpenseFilters } from "@/types/expense";
 
 interface ExpenseFiltersBarProps {
   filters: ExpenseFilters;
@@ -29,24 +23,14 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
         <Label htmlFor={`${fieldId}-category`} className="mb-2">
           Categoria
         </Label>
-        <Select
+        <CategorySelect
+          id={`${fieldId}-category`}
           value={filters.category}
           onValueChange={(value) =>
             onChange({ ...filters, category: value as ExpenseFilters["category"] })
           }
-        >
-          <SelectTrigger id={`${fieldId}-category`} className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">Todas</SelectItem>
-            {EXPENSE_CATEGORIES.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          includeAll
+        />
       </div>
 
       <div>
@@ -81,7 +65,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
         size="lg"
         disabled={!hasFilters}
         className="col-span-2 @lg:col-span-1"
-        onClick={() => onChange({ category: "todas", from: "", to: "" })}
+        onClick={() => onChange(EMPTY_FILTERS)}
       >
         Limpar
       </Button>

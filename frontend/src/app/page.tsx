@@ -8,13 +8,11 @@ import { CategoryBreakdown, SummaryStats } from "@/components/ExpenseSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExpenses } from "@/hooks/useExpenses";
 import { filterExpenses } from "@/lib/expenses";
-import type { ExpenseFilters } from "@/types/expense";
-
-const NO_FILTERS: ExpenseFilters = { category: "todas", from: "", to: "" };
+import { EMPTY_FILTERS, type ExpenseFilters } from "@/types/expense";
 
 export default function Home() {
   const { expenses, addExpense, removeExpense } = useExpenses();
-  const [filters, setFilters] = useState<ExpenseFilters>(NO_FILTERS);
+  const [filters, setFilters] = useState<ExpenseFilters>(EMPTY_FILTERS);
 
   const visible = useMemo(
     () => filterExpenses(expenses, filters),
