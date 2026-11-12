@@ -24,8 +24,8 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
     filters.category !== "todas" || filters.from !== "" || filters.to !== "";
 
   return (
-    <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
-      <div>
+    <div className="grid grid-cols-2 gap-3 @lg:grid-cols-[1fr_1fr_1fr_auto] @lg:items-end">
+      <div className="col-span-2 @lg:col-span-1">
         <Label htmlFor={`${fieldId}-category`} className="mb-2">
           Categoria
         </Label>
@@ -80,6 +80,7 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
         variant="outline"
         size="lg"
         disabled={!hasFilters}
+        className="col-span-2 @lg:col-span-1"
         onClick={() => onChange({ category: "todas", from: "", to: "" })}
       >
         Limpar

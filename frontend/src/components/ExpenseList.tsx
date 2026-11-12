@@ -19,7 +19,7 @@ export function ExpenseList({ expenses, totalCount, onDelete }: ExpenseListProps
         : "Nenhuma despesa encontrada para os filtros selecionados.";
 
     return (
-      <p className="rounded-xl border border-dashed px-4 py-10 text-center text-sm text-muted-foreground">
+      <p className="rounded-xl border border-dashed px-4 py-8 text-center text-sm text-muted-foreground">
         {message}
       </p>
     );

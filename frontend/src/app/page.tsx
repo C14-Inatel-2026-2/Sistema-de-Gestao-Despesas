@@ -4,7 +4,7 @@ import { useMemo, useState } from "react";
 import { ExpenseFiltersBar } from "@/components/ExpenseFilters";
 import { ExpenseForm } from "@/components/ExpenseForm";
 import { ExpenseList } from "@/components/ExpenseList";
-import { ExpenseSummary } from "@/components/ExpenseSummary";
+import { CategoryBreakdown, SummaryStats } from "@/components/ExpenseSummary";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useExpenses } from "@/hooks/useExpenses";
 import { filterExpenses } from "@/lib/expenses";
@@ -22,7 +22,7 @@ export default function Home() {
   );
 
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+    <main className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-6 sm:py-8">
       <header>
         <h1 className="text-2xl font-semibold tracking-tight">Gestão de Despesas</h1>
         <p className="mt-1 text-sm text-muted-foreground">
@@ -30,26 +30,30 @@ export default function Home() {
         </p>
       </header>
 
-      <div className="mt-8 grid gap-6 lg:grid-cols-[380px_1fr] lg:items-start">
-        <ExpenseForm onSubmit={addExpense} />
+      <SummaryStats expenses={visible} className="mt-6" />
 
-        <section className="space-y-6">
-          <ExpenseSummary expenses={visible} />
+      <div className="mt-4 grid gap-4 lg:grid-cols-[360px_1fr] lg:items-start">
+        <aside className="space-y-4 lg:sticky lg:top-6">
+          <ExpenseForm onSubmit={addExpense} />
 
           <Card>
             <CardHeader>
               <CardTitle>Filtros</CardTitle>
             </CardHeader>
-            <CardContent>
+            <CardContent className="@container">
               <ExpenseFiltersBar filters={filters} onChange={setFilters} />
             </CardContent>
           </Card>
+        </aside>
 
+        <section className="space-y-4">
           <ExpenseList
             expenses={visible}
             totalCount={expenses.length}
             onDelete={removeExpense}
           />
+
+          <CategoryBreakdown expenses={visible} />
         </section>
       </div>
     </main>
