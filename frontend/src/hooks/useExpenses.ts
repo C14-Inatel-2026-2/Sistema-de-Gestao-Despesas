@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useSyncExternalStore } from "react";
-import { createExpense, sortByDateDesc } from "@/lib/expenses";
+import { createExpense, replaceExpense, sortByDateDesc } from "@/lib/expenses";
 import { readStore, serverSnapshot, subscribe, writeStore } from "@/lib/expenseStore";
 import type { ExpenseInput } from "@/types/expense";
 
@@ -17,9 +17,13 @@ export function useExpenses() {
     writeStore(sortByDateDesc([expense, ...readStore()]));
   }, []);
 
+  const updateExpense = useCallback((id: string, input: ExpenseInput) => {
+    writeStore(replaceExpense(readStore(), id, input));
+  }, []);
+
   const removeExpense = useCallback((id: string) => {
     writeStore(readStore().filter((expense) => expense.id !== id));
   }, []);
 
-  return { expenses, addExpense, removeExpense };
+  return { expenses, addExpense, updateExpense, removeExpense };
 }
