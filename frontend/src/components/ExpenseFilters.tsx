@@ -1,17 +1,11 @@
 "use client";
 
 import { useId } from "react";
+import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { EXPENSE_CATEGORIES, type ExpenseFilters } from "@/types/expense";
+import { EMPTY_FILTERS, type ExpenseFilters } from "@/types/expense";
 
 interface ExpenseFiltersBarProps {
   filters: ExpenseFilters;
@@ -24,29 +18,19 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
     filters.category !== "todas" || filters.from !== "" || filters.to !== "";
 
   return (
-    <div className="grid gap-3 sm:grid-cols-[1fr_1fr_1fr_auto] sm:items-end">
-      <div>
+    <div className="grid grid-cols-2 gap-3 @lg:grid-cols-[1fr_1fr_1fr_auto] @lg:items-end">
+      <div className="col-span-2 @lg:col-span-1">
         <Label htmlFor={`${fieldId}-category`} className="mb-2">
           Categoria
         </Label>
-        <Select
+        <CategorySelect
+          id={`${fieldId}-category`}
           value={filters.category}
           onValueChange={(value) =>
             onChange({ ...filters, category: value as ExpenseFilters["category"] })
           }
-        >
-          <SelectTrigger id={`${fieldId}-category`} className="w-full">
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="todas">Todas</SelectItem>
-            {EXPENSE_CATEGORIES.map((category) => (
-              <SelectItem key={category.id} value={category.id}>
-                {category.label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+          includeAll
+        />
       </div>
 
       <div>
@@ -80,7 +64,8 @@ export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps)
         variant="outline"
         size="lg"
         disabled={!hasFilters}
-        onClick={() => onChange({ category: "todas", from: "", to: "" })}
+        className="col-span-2 @lg:col-span-1"
+        onClick={() => onChange(EMPTY_FILTERS)}
       >
         Limpar
       </Button>

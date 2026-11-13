@@ -1,22 +1,12 @@
 "use client";
 
 import { useId, useState } from "react";
+import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import {
-  EXPENSE_CATEGORIES,
-  type ExpenseErrors,
-  type ExpenseInput,
-} from "@/types/expense";
+import type { ExpenseErrors, ExpenseInput } from "@/types/expense";
 import { isValid, toIsoDate, validateExpense } from "@/lib/expenses";
 
 function emptyForm(): ExpenseInput {
@@ -110,21 +100,12 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
             error={errors.category}
             className="sm:col-span-2"
           >
-            <Select
+            <CategorySelect
+              id={ids.category}
               value={form.category}
               onValueChange={(value) => update("category", value)}
-            >
-              <SelectTrigger id={ids.category} className="w-full">
-                <SelectValue placeholder="Selecione uma categoria" />
-              </SelectTrigger>
-              <SelectContent>
-                {EXPENSE_CATEGORIES.map((category) => (
-                  <SelectItem key={category.id} value={category.id}>
-                    {category.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+              placeholder="Selecione uma categoria"
+            />
           </Field>
 
           <Button type="submit" size="lg" className="mt-1 w-full sm:col-span-2">
