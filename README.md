@@ -377,6 +377,27 @@ Validação local antes e depois dos refactorings, com Python 3.12 e Node 22:
 
 As evidências de execução do pipeline Jenkins antes e depois estão registradas no [PR #48](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/48). A revisão segue o padrão da última entrega: **Marco Di Toro (`Frombull`)** e **Gabriel Gazotti (`GabrielGazotti`)**, com duas aprovações antes do merge. Esta seção documenta a contribuição de Paulo; cada integrante deve registrar pelo menos dois refactorings próprios.
 
+### João Victor Siécola Souza
+
+Entrega individual de **João Victor Siécola Souza**, com dois refactorings no armazenamento de despesas do frontend (`frontend/src/hooks/useExpenses.ts`), registrados em commits separados no [PR #54](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/54).
+
+| Smell | Refactoring aplicado | Por quê | PR |
+| --- | --- | --- | --- |
+| **Divergent Change:** `useExpenses.ts` misturava o hook do React com o cache, a leitura e a escrita no `localStorage` e a sincronização entre abas. | **Extract Module:** a parte de armazenamento foi movida, sem alterar a lógica, para `frontend/src/lib/expenseStore.ts`; o hook caiu de 95 para 26 linhas. | Separa a responsabilidade do React da persistência. A troca do `localStorage` pela API (US08) fica concentrada em um único módulo, sem mexer no hook nem nas telas. | [#54](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/54) |
+| **Duplicate Code:** a gravação no `localStorage` tinha dois `try/catch` equivalentes, e a primeira visita repetia as mesmas linhas no `try` e no `catch`. | **Extract Function:** `trySave(raw)` concentra a gravação e informa se deu certo; `applyFirstVisitMock()` concentra a primeira visita. | Mantém o tratamento de falha de gravação em um único ponto e deixa o `readStore` e o `writeStore` mais curtos e legíveis. | [#54](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/54) |
+
+Os refactorings preservam o comportamento, inclusive o tratamento diferente das falhas: na primeira visita o cache fica `null` quando a gravação falha, e no `writeStore` o cache recebe a lista nova mesmo assim. Antes das extrações foram adicionados quatro testes de caracterização (`useExpensesPersistencia.test.ts`), cobrindo a gravação na primeira visita e ao adicionar, com e sem falha do `localStorage`. Os testes existentes não foram alterados.
+
+Validação local antes e depois de cada refactoring, com Node 22:
+
+| Verificação | `main` original | + testes de caracterização | Depois do refactoring 1 | Depois do refactoring 2 |
+| --- | --- | --- | --- | --- |
+| Frontend — Vitest | 65 aprovados | 69 aprovados | 69 aprovados | 69 aprovados |
+| Cobertura de linhas | 85,84% | 87,26% | 87,26% | 87,20% |
+| ESLint e TypeScript | Aprovados | Aprovados | Aprovados | Aprovados |
+
+A pequena queda de cobertura no refactoring 2 vem da redução do total de linhas; a quantidade de linhas não cobertas permaneceu a mesma (27). Os testes de caracterização também revelaram um comportamento preexistente: se o `localStorage` recusar a gravação, a despesa recém-adicionada deixa de aparecer na leitura seguinte. Como refactoring não altera comportamento, a correção fica para um commit `fix:` separado.
+
 Prazo informado para a entrega e demais correções: **13/11/2026 às 23h59 (America/Bahia)**.
 
 ---
