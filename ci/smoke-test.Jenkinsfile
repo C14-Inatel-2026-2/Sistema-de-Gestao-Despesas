@@ -22,13 +22,14 @@ pipeline {
       steps {
         sh '''#!/bin/sh
 set -u
+PUBLIC_FRONT="${PUBLIC_FRONTEND_URL:-https://sistema-de-gestao-despesas.vercel.app}"
 FRONT="http://127.0.0.1:${FRONTEND_PORT:-3000}"
 API="http://127.0.0.1:${BACKEND_PORT:-8000}"
 REPORT=reports/smoke-test.txt
 FALHAS=0
 
 req() {
-  docker run --rm --network host curlimages/curl:8.11.1 -s --max-time 10 "$@"
+  docker run --rm --network host curlimages/curl:8.11.1 -sS --location --max-time 20 "$@"
 }
 
 checar() {
@@ -41,11 +42,17 @@ checar() {
 }
 
 echo "Smoke test do commit $IMAGE_TAG" | tee "$REPORT"
+date -u '+Data UTC: %Y-%m-%dT%H:%M:%SZ' | tee -a "$REPORT"
+echo "Frontend publico: $PUBLIC_FRONT" | tee -a "$REPORT"
+echo "Frontend Docker: $FRONT; API: $API" | tee -a "$REPORT"
+
+STATUS=$(req -o /dev/null -w '%{http_code}' "$PUBLIC_FRONT/")
+checar "GET / (Vercel publico)" "$STATUS" "200"
 
 STATUS=$(req -o /dev/null -w '%{http_code}' "$FRONT/")
 checar "GET / (frontend)" "$STATUS" "200"
 
-if req "$API/health" | grep -q '"status":"ok"'; then
+if req --fail "$API/health" | grep -Eq '"status"[[:space:]]*:[[:space:]]*"ok"'; then
   checar "GET /health" "ok" "ok"
 else
   checar "GET /health" "sem status ok" "ok"

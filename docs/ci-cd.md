@@ -61,3 +61,40 @@ docker compose -p despesas-validacao down
 ```
 
 A exigência de duas aprovações por PR só bloqueia o merge se um administrador configurar a proteção da `main`.
+
+## US06 — comprovação e limites
+
+O Jenkins local verifica novos commits na `main` a cada minuto. Mantenha a
+instância ligada para executar testes, build, deploy Docker e smoke após merges.
+Falhas dos jobs são propagadas ao coordenador e impedem deploy e smoke.
+
+O job de deploy arquiva `reports/deploy.txt` com SHA, data UTC e estado dos
+containers. O smoke arquiva `reports/smoke-test.txt` com SHA, data UTC, URLs e
+resultados; verifica também o endereço público da Vercel (substituível pela
+variável `PUBLIC_FRONTEND_URL`). Falhas HTTP ou de conexão reprovam o smoke.
+
+O deploy cria uma publicação de produção na Vercel pela API, usando o SHA
+aprovado, aguarda `READY` e a atribuição de domínio e verifica o SHA retornado.
+O artefato `reports/vercel-deploy.json` registra ID, URL, SHA e data UTC.
+`frontend/vercel.json` desativa os deploys automáticos da integração Git,
+impedindo que ela publique antes dos testes do Jenkins.
+
+Antes do merge, configure no Jenkins:
+
+- credencial **Secret text** de ID `vercel-token`, com token da conta Vercel;
+- variável global `VERCEL_PROJECT_ID`, com o ID do projeto existente;
+- `VERCEL_TEAM_ID` se o projeto pertencer a uma equipe.
+
+O projeto Vercel deve continuar vinculado a este repositório, com Root Directory
+`frontend` e domínio `sistema-de-gestao-despesas.vercel.app`. Sem credencial ou
+projeto, o deploy falha; não há fallback que ignore a publicação. Mantenha o
+Jenkins ligado antes do merge: os deploys automáticos da Vercel serão desativados.
+A API permanece no host Docker do Jenkins, verificada pelo smoke local.
+
+Referências: [criação de deploy](https://vercel.com/docs/rest-api/deployments/create-a-new-deployment)
+e [controle de deploy automático](https://vercel.com/docs/project-configuration/git-configuration).
+
+Para encerrar a #31, registre uma execução bem-sucedida do coordenador na
+`main`, anexe os dois artefatos e demonstre que um teste falhando impede a
+publicação de produção. Não marque a história concluída apenas com base no
+smoke da versão que já está no ar.

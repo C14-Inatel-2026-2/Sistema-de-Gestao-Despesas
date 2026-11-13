@@ -332,7 +332,7 @@ flowchart LR
     G --> I[Smoke test]
 ```
 
-Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o mesmo SHA; as imagens são identificadas por esse SHA. O deploy roda apenas na `main`, reutiliza as imagens do build e aguarda frontend e API ficarem saudáveis. Em seguida, o smoke test acessa o frontend, `/health` e `GET /despesas`, e confirma que um `POST /despesas` inválido é recusado com 422; o resultado fica em **Artifacts** (`reports/smoke-test.txt`). Este deploy usa Docker Compose no agente Jenkins; a hospedagem existente na Vercel continua independente.
+Falhas ou testes instáveis impedem as próximas etapas. Todos os jobs recebem o mesmo SHA; as imagens são identificadas por esse SHA. O deploy roda apenas na `main`, reutiliza as imagens do build e aguarda frontend e API ficarem saudáveis. Em seguida, o smoke test acessa o frontend, `/health` e `GET /despesas`, e confirma que um `POST /despesas` inválido é recusado com 422; o resultado fica em **Artifacts** (`reports/smoke-test.txt`). O deploy também publica o SHA aprovado na Vercel e aguarda a conclusão; a integração Git automática fica desativada. Configure as credenciais antes do merge, conforme [CI/CD](docs/ci-cd.md#us06--comprovação-e-limites).
 
 Em cada execução dos jobs de testes, abra **Test Result** para consultar os resultados e **Cobertura Frontend** ou **Cobertura Backend** para visualizar os arquivos e linhas cobertas. Os relatórios HTML e XML também ficam disponíveis em **Artifacts**, inclusive quando há falha nos testes. A cobertura inclui arquivos da aplicação sem testes. O job `cobertura-minima` exige pelo menos 80% de cobertura de linhas e statements no frontend e no backend; abaixo disso o pipeline falha antes do build.
 
