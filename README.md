@@ -359,6 +359,32 @@ alembic upgrade head
 
 ---
 
+## Refactorings
+
+Entrega individual de **Paulo Vicente**, com dois refactorings em `backend/src/main.py`, registrados em commits separados no [PR #48](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/48).
+
+| Smell | Refactoring aplicado | Por quê | PR |
+| --- | --- | --- | --- |
+| **Duplicate Code:** POST e PUT repetiam a validação de negócio e a montagem da resposta HTTP 422. | **Extract Function:** `_validar_dados_despesa(despesa)`, reutilizada por `criar_despesa` e `atualizar_despesa`. | Centraliza a tradução dos erros de negócio para HTTP, evitando divergências nas mensagens e no formato da resposta ao alterar a validação. | [#48](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/48) |
+| **Duplicate Code:** PUT e DELETE repetiam a busca pelo ID e o tratamento da despesa inexistente. | **Extract Function:** `_buscar_despesa_ou_404(db, despesa_id)`, reutilizada por `atualizar_despesa` e `excluir_despesa`. | Mantém a busca e a resposta 404 em um único ponto, simplificando os endpoints e evitando inconsistências no tratamento de IDs inexistentes. | [#48](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/48) |
+
+Os refactorings preservam os status HTTP, as mensagens, os dados persistidos e a ordem das operações: no PUT, a busca continua ocorrendo antes da validação de negócio. Seis casos de regressão foram adicionados e executados antes das extrações e novamente depois, cobrindo atualização, exclusão, respostas 404/422 e preservação do banco em falhas.
+
+Validação local antes e depois dos refactorings, com Python 3.12 e Node 22:
+
+| Verificação | Antes | Depois |
+| --- | --- | --- |
+| Backend — pytest | 28 testes aprovados; 100% de cobertura | 28 testes aprovados; 100% de cobertura |
+| Frontend — Vitest | 65 testes aprovados; 85,84% de linhas e 86,08% de statements | 65 testes aprovados; 85,84% de linhas e 86,08% de statements |
+| Qualidade — Ruff, ESLint e TypeScript | Aprovados | Aprovados |
+| Cobertura mínima de 80% | Aprovada nas duas aplicações | Aprovada nas duas aplicações |
+
+As evidências de execução do pipeline Jenkins antes e depois estão registradas no [PR #48](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/48). A revisão segue o padrão da última entrega: **Marco Di Toro (`Frombull`)** e **Gabriel Gazotti (`GabrielGazotti`)**, com duas aprovações antes do merge. Esta seção documenta a contribuição de Paulo; cada integrante deve registrar pelo menos dois refactorings próprios.
+
+Prazo informado para a entrega e demais correções: **13/11/2026 às 23h59 (America/Bahia)**.
+
+---
+
 ## Fluxo de trabalho
 
 Cada integrante trabalha na própria branch e envia as alterações por Pull Request, que precisa ser aprovado por **dois outros integrantes** antes do merge na `main`. Cada integrante deve fazer no mínimo um commit no projeto.

@@ -1,7 +1,4 @@
-"""Ponto de entrada da API.
-
-PUT /despesas/{id} e DELETE /despesas/{id} ainda não estão aqui
-"""
+"""Ponto de entrada da API e operações de despesas."""
 
 from fastapi import Depends, FastAPI, HTTPException, status
 from sqlalchemy import select
@@ -17,6 +14,27 @@ from expenses import validar_despesa
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Sistema de Gestão de Despesas - API")
+
+
+def _validar_dados_despesa(despesa: schemas.DespesaBase) -> None:
+    """Converte os erros de negócio no formato HTTP usado pela API."""
+    erros = validar_despesa(despesa.valor, despesa.descricao)
+    if erros:
+        raise HTTPException(
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+            detail=[{"campo": e.campo, "mensagem": e.mensagem} for e in erros],
+        )
+
+
+def _buscar_despesa_ou_404(db: Session, despesa_id: int) -> models.Despesa:
+    """Busca a despesa e preserva a resposta da API quando ela não existe."""
+    despesa = db.get(models.Despesa, despesa_id)
+    if despesa is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Despesa {despesa_id} não encontrada.",
+        )
+    return despesa
 
 
 @app.get("/health")
@@ -40,13 +58,7 @@ def criar_despesa(
     despesa: schemas.DespesaCreate, db: Session = Depends(get_db)
 ) -> models.Despesa:
     """Cadastra uma nova despesa, reaproveitando as regras de expenses.py."""
-    erros = validar_despesa(despesa.valor, despesa.descricao)
-    if erros:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=[{"campo": e.campo, "mensagem": e.mensagem} for e in erros],
-        )
-
+    _validar_dados_despesa(despesa)
     nova_despesa = models.Despesa(**despesa.model_dump())
     db.add(nova_despesa)
     db.commit()
@@ -59,23 +71,12 @@ def atualizar_despesa(
     despesa_id: int, despesa: schemas.DespesaUpdate, db: Session = Depends(get_db)
 ) -> models.Despesa:
     """Atualiza uma despesa existente (substitui todos os campos)."""
-    despesa_existente = db.get(models.Despesa, despesa_id)
-    if despesa_existente is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Despesa {despesa_id} não encontrada.",
-        )
- 
-    erros = validar_despesa(despesa.valor, despesa.descricao)
-    if erros:
-        raise HTTPException(
-            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=[{"campo": e.campo, "mensagem": e.mensagem} for e in erros],
-        )
- 
+    despesa_existente = _buscar_despesa_ou_404(db, despesa_id)
+    _validar_dados_despesa(despesa)
+
     for campo, valor in despesa.model_dump().items():
         setattr(despesa_existente, campo, valor)
- 
+
     db.commit()
     db.refresh(despesa_existente)
     return despesa_existente
@@ -84,12 +85,6 @@ def atualizar_despesa(
 @app.delete("/despesas/{despesa_id}", status_code=status.HTTP_204_NO_CONTENT)
 def excluir_despesa(despesa_id: int, db: Session = Depends(get_db)) -> None:
     """Remove uma despesa pelo id."""
-    despesa_existente = db.get(models.Despesa, despesa_id)
-    if despesa_existente is None:
-        raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail=f"Despesa {despesa_id} não encontrada.",
-        )
- 
+    despesa_existente = _buscar_despesa_ou_404(db, despesa_id)
     db.delete(despesa_existente)
     db.commit()

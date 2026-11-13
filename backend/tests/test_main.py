@@ -97,3 +97,85 @@ def test_listar_despesas_retorna_as_cadastradas(client: TestClient) -> None:
     despesas = resposta.json()
     assert len(despesas) == 1
     assert despesas[0]["descricao"] == "Uber"
+
+
+def test_atualizar_despesa_persiste_todos_os_campos(client: TestClient) -> None:
+    payload = {
+        "descricao": "Almoço",
+        "valor": 35.5,
+        "categoria": "Alimentação",
+        "data": "2026-09-10",
+    }
+    criada = client.post("/despesas", json=payload).json()
+    atualizada = {
+        "descricao": "Cinema",
+        "valor": 50,
+        "categoria": "Lazer",
+        "data": "2026-09-11",
+    }
+
+    resposta = client.put(f"/despesas/{criada['id']}", json=atualizada)
+
+    assert resposta.status_code == 200
+    assert resposta.json() == {**criada, **atualizada}
+    assert client.get("/despesas").json() == [resposta.json()]
+
+
+def test_excluir_despesa_remove_do_banco(client: TestClient) -> None:
+    criada = client.post(
+        "/despesas",
+        json={
+            "descricao": "Almoço",
+            "valor": 35.5,
+            "categoria": "Alimentação",
+            "data": "2026-09-10",
+        },
+    ).json()
+
+    resposta = client.delete(f"/despesas/{criada['id']}")
+
+    assert resposta.status_code == 204
+    assert resposta.content == b""
+    assert client.get("/despesas").json() == []
+
+
+@pytest.mark.parametrize("metodo", ["put", "delete"])
+def test_despesa_inexistente_preserva_resposta_404(
+    client: TestClient, metodo: str
+) -> None:
+    payload = {
+        "descricao": "   ",
+        "valor": 35.5,
+        "categoria": "Alimentação",
+        "data": "2026-09-10",
+    }
+    # No PUT, a busca deve ocorrer antes da validação de negócio da descrição.
+    kwargs = {"json": payload} if metodo == "put" else {}
+
+    resposta = client.request(metodo, "/despesas/999", **kwargs)
+
+    assert resposta.status_code == 404
+    assert resposta.json() == {"detail": "Despesa 999 não encontrada."}
+    assert client.get("/despesas").json() == []
+
+
+@pytest.mark.parametrize("metodo", ["post", "put"])
+def test_descricao_em_branco_preserva_erro_e_nao_persiste(
+    client: TestClient, metodo: str
+) -> None:
+    payload = {
+        "descricao": "Almoço",
+        "valor": 35.5,
+        "categoria": "Alimentação",
+        "data": "2026-09-10",
+    }
+    criada = client.post("/despesas", json=payload).json()
+    rota = "/despesas" if metodo == "post" else f"/despesas/{criada['id']}"
+
+    resposta = client.request(metodo, rota, json={**payload, "descricao": "   "})
+
+    assert resposta.status_code == 422
+    assert resposta.json() == {
+        "detail": [{"campo": "descricao", "mensagem": "A descrição não pode ser vazia."}]
+    }
+    assert client.get("/despesas").json() == [criada]

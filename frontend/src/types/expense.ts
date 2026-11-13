@@ -36,6 +36,8 @@ export interface ExpenseFilters {
   to: string;
 }
 
+export const EMPTY_FILTERS: ExpenseFilters = { category: "todas", from: "", to: "" };
+
 export function categoryLabel(id: ExpenseCategory): string {
   return EXPENSE_CATEGORIES.find((c) => c.id === id)?.label ?? id;
 }
