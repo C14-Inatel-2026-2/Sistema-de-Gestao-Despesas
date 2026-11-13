@@ -34,7 +34,7 @@ Funcionalidades previstas:
 | Código | Requisito | História | Situação |
 | --- | --- | --- | --- |
 | RF01 | Permitir cadastrar despesas com valor, descrição, categoria e data. | US01 | Implementado (frontend e API) |
-| RF02 | Permitir editar despesas cadastradas. | US03 | API pronta; tela de edição pendente |
+| RF02 | Permitir editar despesas cadastradas. | US03 | Implementado (frontend e API) |
 | RF03 | Permitir excluir despesas. | US04 | Implementado (frontend e API) |
 | RF04 | Listar todas as despesas cadastradas. | US02 | Implementado (frontend e API) |
 | RF05 | Permitir categorizar despesas em Alimentação, Transporte, Moradia, Saúde, Educação, Lazer ou Outros. | US01 | Implementado no frontend |
@@ -54,12 +54,12 @@ Funcionalidades previstas:
 | RNF04 | O banco de dados de produção deverá ser PostgreSQL. | Parcial: a API lê `DATABASE_URL` e inclui o driver, mas o padrão local e o Docker Compose usam SQLite |
 | RNF05 | A API deverá disponibilizar documentação Swagger/OpenAPI. | Atendido (`/docs` e `/openapi.json`) |
 | RNF06 | O ambiente deverá poder ser executado com Docker e Docker Compose. | Atendido |
-| RNF07 | O sistema deverá possuir testes automatizados com pytest (backend) e Vitest (frontend). | Atendido: 22 testes pytest e 65 Vitest |
+| RNF07 | O sistema deverá possuir testes automatizados com pytest (backend) e Vitest (frontend). | Atendido: 36 testes pytest e 89 Vitest |
 | RNF08 | O projeto deverá utilizar GitHub para versionamento, com branches e Pull Requests. | Atendido |
 | RNF09 | O pipeline CI/CD deverá utilizar Jenkins para executar verificações automatizadas. | Parcial: pipeline versionado; execução na instância Jenkins pendente |
 | RNF10 | Os dados deverão ser validados no frontend e na API: valor maior que zero, data não futura e categoria existente. | Parcial: o frontend valida tudo; a API valida valor e descrição |
 | RNF11 | A API deverá seguir o padrão REST com JSON. | Atendido |
-| RNF12 | O código deverá possuir pelo menos 80% de cobertura de testes no frontend e no backend. | Atendido: 85,84% de linhas no frontend e 86% no backend; o job `cobertura-minima` exige 80% |
+| RNF12 | O código deverá possuir pelo menos 80% de cobertura de testes no frontend e no backend. | Atendido: 85,77% de linhas no frontend e 100% no backend; o job `cobertura-minima` exige 80% |
 | RNF13 | Toda alteração deverá passar por Pull Request com duas aprovações e pelas verificações do pipeline Jenkins. | Regra do grupo, descrita em [Fluxo de trabalho](#fluxo-de-trabalho) |
 | RNF14 | A aplicação deverá iniciar com Docker Compose, sem instalação manual das dependências no host. | Atendido |
 | RNF15 | As mudanças no banco deverão ser versionadas com Alembic. | Atendido |
@@ -83,7 +83,7 @@ As funcionalidades são organizadas em histórias de usuário, cadastradas como 
 | --- | --- | --- | --- |
 | [US01 — Cadastrar despesa](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/26) | André Dias Balbino | RF01, RF05 | Done |
 | [US02 — Listar despesas, total e resumo por categoria](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/27) | Gabriel Gazotti | RF04, RF07 | Done |
-| [US03 — Editar despesa](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/28) | André Dias Balbino | RF02 | Todo |
+| [US03 — Editar despesa](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/28) | André Dias Balbino | RF02 | Done |
 | [US04 — Excluir despesa](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/29) | João Victor Siécola Souza | RF03 | Done |
 | [US05 — Filtrar despesas por período e categoria](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/30) | Marco Di Toro | RF06 | Done |
 | [US06 — Acessar o sistema online sempre atualizado](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/issues/31) | Paulo Vicente | RNF09 | In Progress |
@@ -248,7 +248,7 @@ Sistema-de-Gestao-Despesas/
 | Integração (API)    | pytest + `TestClient`    | Endpoints reais, requisição/resposta |
 | Exploratório        | Postman                  | Testes manuais e demonstração        |
 
-Atualmente há 65 testes Vitest e 22 testes pytest, todos passando. Testes ponta a ponta no navegador não fazem parte do escopo atual.
+Atualmente há 89 testes Vitest e 36 testes pytest, todos passando. Testes ponta a ponta no navegador não fazem parte do escopo atual.
 
 O `TestClient` do FastAPI usa httpx por baixo, então os testes de integração batem nos endpoints de verdade sem precisar subir um servidor. A collection do Postman deve ser importada do `/openapi.json`, para não ser mantida à mão quando a API mudar.
 
@@ -288,6 +288,7 @@ Funcionalidades cobertas pelos testes:
 
 * Validação de valores de despesas;
 * Cadastro de despesas (unitário e de componente);
+* Edição de despesas: formulário preenchido, mesmas validações do cadastro, atualização da lista e do total, e resposta 404 da API (unitário, com e sem mock, e de componente);
 * Listagem, exclusão e estados vazios (componente);
 * Cálculo do total de despesas e resumo por categoria (domínio e componente);
 * Filtro de despesas por categoria e por período (domínio e componente);
@@ -379,6 +380,29 @@ As evidências de execução do pipeline Jenkins antes e depois estão registrad
 
 Prazo informado para a entrega e demais correções: **13/11/2026 às 23h59 (America/Bahia)**.
 
+### André Dias Balbino
+
+Entrega individual de **André Dias Balbino**, com um refactoring no backend (`backend/alembic/env.py`) e um no frontend (`frontend/src/lib/expenses.ts`), registrados em commits separados no [#57](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/57).
+
+| Smell | Refactoring aplicado | Por quê | PR |
+| --- | --- | --- | --- |
+| **Duplicate Code:** a URL padrão do banco (`os.getenv("DATABASE_URL", "sqlite:///./despesas.db")`) estava repetida em `backend/src/database.py`, usado pela API, e em `backend/alembic/env.py`, usado pelas migrações. | **Reutilizar a constante:** o `env.py` passa a importar `DATABASE_URL` de `database.py`, que vira a única fonte da URL; saem o `os.getenv` duplicado e o `import os` sem uso. | Se o padrão mudasse em um arquivo só, a API e as migrações passariam a usar bancos diferentes, sem nenhum erro. Com uma única definição, os dois sempre apontam para o mesmo banco. | #? |
+| **Long Method:** `validateExpense` tinha 34 linhas com quatro validações independentes (descrição, valor, categoria e data) misturadas em blocos `if/else if`. | **Extract Function:** `validateDescription`, `validateAmount`, `validateCategory` e `validateDate`, com *guard clauses* no lugar dos `else if`; `validateExpense` só reúne os erros. As funções novas são internas ao módulo. | Cada regra fica isolada e nomeada, então alterar uma validação não exige ler as demais. A mesma validação vale para o cadastro e para a edição (US03). | #? |
+
+Os refactorings preservam o comportamento. No backend, a URL usada pela API e pelas migrações continua a mesma, inclusive o carregamento do `.env`, que já acontecia ao importar `database.py`. No frontend, as mensagens de erro, os campos retornados e a ordem das regras são os mesmos; um campo sem erro continua ausente do objeto, como `isValid` espera.
+
+Validação local antes e depois dos refactorings, com Python 3.14 e Node 24:
+
+| Verificação | Antes | Depois |
+| --- | --- | --- |
+| Backend — pytest | 36 testes aprovados; 100% de cobertura | 36 testes aprovados; 100% de cobertura |
+| Backend — migrações (`upgrade head`, `check`, `downgrade base`, `upgrade head`) | Aprovadas, com e sem `DATABASE_URL` | Aprovadas, com e sem `DATABASE_URL` |
+| Frontend — Vitest | 89 testes aprovados; 85,34% de linhas e 85,6% de statements | 89 testes aprovados; 85,77% de linhas e 86,44% de statements |
+| Qualidade — Ruff, ESLint e TypeScript | Aprovados | Aprovados |
+| Cobertura mínima de 80% | Aprovada nas duas aplicações | Aprovada nas duas aplicações |
+
+A variação na cobertura do frontend vem da mudança no número de statements com a extração das funções; nenhum teste foi alterado no refactoring.
+
 ---
 
 ## Fluxo de trabalho
@@ -434,4 +458,4 @@ git commit -m "docs: atualiza documentação"
 
 ## Status
 
-Em desenvolvimento. O frontend está publicado na Vercel e a API possui CRUD de despesas. Falta integrar o frontend à API (US08), criar a tela de edição (US03) e o dashboard (US07), além de executar o pipeline na instância Jenkins e registrar as evidências (US06).
+Em desenvolvimento. O frontend está publicado na Vercel, com cadastro, edição, exclusão, filtros e totais, e a API possui CRUD de despesas. Falta integrar o frontend à API (US08) e criar o dashboard (US07), além de executar o pipeline na instância Jenkins e registrar as evidências (US06).

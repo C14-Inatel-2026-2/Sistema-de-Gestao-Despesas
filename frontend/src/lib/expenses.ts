@@ -49,6 +49,38 @@ export function toIsoDate(date: Date): string {
   return `${year}-${month}-${day}`;
 }
 
+function validateDescription(raw: string): string | undefined {
+  const description = raw.trim();
+  if (description.length < MIN_DESCRIPTION_LENGTH) {
+    return `A descrição precisa ter pelo menos ${MIN_DESCRIPTION_LENGTH} caracteres.`;
+  }
+  if (description.length > MAX_DESCRIPTION_LENGTH) {
+    return `A descrição pode ter no máximo ${MAX_DESCRIPTION_LENGTH} caracteres.`;
+  }
+  return undefined;
+}
+
+function validateAmount(raw: string): string | undefined {
+  const amount = parseAmount(raw);
+  if (amount === null) return "Informe um valor numérico válido.";
+  if (amount <= 0) return "O valor deve ser maior que zero.";
+  if (amount > MAX_AMOUNT) {
+    return `O valor deve ser menor que ${formatCurrency(MAX_AMOUNT)}.`;
+  }
+  return undefined;
+}
+
+function validateCategory(value: string): string | undefined {
+  if (!isExpenseCategory(value)) return "Selecione uma categoria.";
+  return undefined;
+}
+
+function validateDate(value: string, today: string): string | undefined {
+  if (!isValidIsoDate(value)) return "Informe uma data válida.";
+  if (value > today) return "A data não pode estar no futuro.";
+  return undefined;
+}
+
 /**
  * Valida os dados de uma despesa vindos do formulário.
  * `today` é injetado para manter a função pura e testável.
@@ -59,31 +91,17 @@ export function validateExpense(
 ): ExpenseErrors {
   const errors: ExpenseErrors = {};
 
-  const description = input.description.trim();
-  if (description.length < MIN_DESCRIPTION_LENGTH) {
-    errors.description = `A descrição precisa ter pelo menos ${MIN_DESCRIPTION_LENGTH} caracteres.`;
-  } else if (description.length > MAX_DESCRIPTION_LENGTH) {
-    errors.description = `A descrição pode ter no máximo ${MAX_DESCRIPTION_LENGTH} caracteres.`;
-  }
+  const descriptionError = validateDescription(input.description);
+  if (descriptionError) errors.description = descriptionError;
 
-  const amount = parseAmount(input.amount);
-  if (amount === null) {
-    errors.amount = "Informe um valor numérico válido.";
-  } else if (amount <= 0) {
-    errors.amount = "O valor deve ser maior que zero.";
-  } else if (amount > MAX_AMOUNT) {
-    errors.amount = `O valor deve ser menor que ${formatCurrency(MAX_AMOUNT)}.`;
-  }
+  const amountError = validateAmount(input.amount);
+  if (amountError) errors.amount = amountError;
 
-  if (!isExpenseCategory(input.category)) {
-    errors.category = "Selecione uma categoria.";
-  }
+  const categoryError = validateCategory(input.category);
+  if (categoryError) errors.category = categoryError;
 
-  if (!isValidIsoDate(input.date)) {
-    errors.date = "Informe uma data válida.";
-  } else if (input.date > today) {
-    errors.date = "A data não pode estar no futuro.";
-  }
+  const dateError = validateDate(input.date, today);
+  if (dateError) errors.date = dateError;
 
   return errors;
 }
@@ -106,6 +124,30 @@ export function createExpense(input: ExpenseInput, id: string): Expense {
     category: input.category,
     date: input.date,
   };
+}
+
+/** Converte uma despesa salva de volta para o formato do formulário (usado na edição). */
+export function expenseToInput(expense: Expense): ExpenseInput {
+  return {
+    description: expense.description,
+    amount: expense.amount.toFixed(2).replace(".", ","),
+    category: expense.category,
+    date: expense.date,
+  };
+}
+
+/**
+ * Substitui a despesa com o `id` informado pelos novos dados, mantendo a ordenação por data.
+ * Se o id não existir, devolve a lista sem alterações.
+ */
+export function replaceExpense(
+  expenses: readonly Expense[],
+  id: string,
+  input: ExpenseInput,
+): Expense[] {
+  if (!expenses.some((expense) => expense.id === id)) return [...expenses];
+  const updated = createExpense(input, id);
+  return sortByDateDesc(expenses.map((expense) => (expense.id === id ? updated : expense)));
 }
 
 export function calculateTotal(expenses: readonly Expense[]): number {

@@ -33,7 +33,7 @@ function hasCurrency(amount: string) {
 describe("<ExpenseList />", () => {
   it("renderiza descrição, categoria, data e valor em BRL", () => {
     render(
-      <ExpenseList expenses={expenses} totalCount={2} onDelete={vi.fn()} />,
+      <ExpenseList expenses={expenses} totalCount={2} onEdit={vi.fn()} onDelete={vi.fn()} />,
     );
 
     expect(screen.getByText("Supermercado")).toBeInTheDocument();
@@ -49,7 +49,7 @@ describe("<ExpenseList />", () => {
     const user = userEvent.setup();
     const onDelete = vi.fn();
     render(
-      <ExpenseList expenses={expenses} totalCount={2} onDelete={onDelete} />,
+      <ExpenseList expenses={expenses} totalCount={2} onEdit={vi.fn()} onDelete={onDelete} />,
     );
 
     await user.click(
@@ -60,8 +60,33 @@ describe("<ExpenseList />", () => {
     expect(onDelete).toHaveBeenCalledWith("exp-1");
   });
 
+  it("cada despesa tem uma ação de editar", () => {
+    render(
+      <ExpenseList expenses={expenses} totalCount={2} onEdit={vi.fn()} onDelete={vi.fn()} />,
+    );
+
+    expect(screen.getAllByRole("button", { name: /editar despesa/i })).toHaveLength(
+      expenses.length,
+    );
+  });
+
+  it("chama onEdit com a despesa ao clicar em editar", async () => {
+    const user = userEvent.setup();
+    const onEdit = vi.fn();
+    const onDelete = vi.fn();
+    render(
+      <ExpenseList expenses={expenses} totalCount={2} onEdit={onEdit} onDelete={onDelete} />,
+    );
+
+    await user.click(screen.getByRole("button", { name: /editar despesa uber/i }));
+
+    expect(onEdit).toHaveBeenCalledTimes(1);
+    expect(onEdit).toHaveBeenCalledWith(expenses[1]);
+    expect(onDelete).not.toHaveBeenCalled();
+  });
+
   it("mostra convite para cadastrar quando não há despesas na base", () => {
-    render(<ExpenseList expenses={[]} totalCount={0} onDelete={vi.fn()} />);
+    render(<ExpenseList expenses={[]} totalCount={0} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
     expect(
       screen.getByText(/nenhuma despesa cadastrada ainda/i),
@@ -69,7 +94,7 @@ describe("<ExpenseList />", () => {
   });
 
   it("mostra mensagem de filtros quando a base tem itens mas a lista filtrada está vazia", () => {
-    render(<ExpenseList expenses={[]} totalCount={3} onDelete={vi.fn()} />);
+    render(<ExpenseList expenses={[]} totalCount={3} onEdit={vi.fn()} onDelete={vi.fn()} />);
 
     expect(
       screen.getByText(/nenhuma despesa encontrada para os filtros/i),

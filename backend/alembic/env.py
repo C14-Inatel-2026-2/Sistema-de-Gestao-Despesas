@@ -1,4 +1,3 @@
-import os
 import sys
 from logging.config import fileConfig
 from pathlib import Path
@@ -9,15 +8,15 @@ from sqlalchemy import engine_from_config, pool
 # Permite importar os módulos de backend/src (database.py, models.py)
 sys.path.append(str(Path(__file__).resolve().parents[1] / "src"))
 
-from database import Base  # noqa: E402
+from database import DATABASE_URL, Base  # noqa: E402
 import models  # noqa: E402,F401  (import necessário p/ registrar as tabelas em Base.metadata)
 
 config = context.config
 
-# Usa DATABASE_URL do ambiente se definida (ex: Postgres em produção);
-# senão cai no SQLite local, igual ao database.py da aplicação.
-db_url = os.getenv("DATABASE_URL", "sqlite:///./despesas.db")
-config.set_main_option("sqlalchemy.url", db_url)
+# Reutiliza a mesma URL da aplicação (database.py): DATABASE_URL do ambiente
+# se definida (ex: Postgres em produção), senão o SQLite local. Assim a API e
+# as migrações nunca apontam para bancos diferentes.
+config.set_main_option("sqlalchemy.url", DATABASE_URL)
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
