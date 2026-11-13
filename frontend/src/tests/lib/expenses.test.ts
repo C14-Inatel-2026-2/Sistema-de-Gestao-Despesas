@@ -3,10 +3,12 @@ import type { Expense } from "@/types/expense";
 import {
   calculateTotal,
   createExpense,
+  expenseToInput,
   filterExpenses,
   formatDate,
   isValid,
   parseAmount,
+  replaceExpense,
   roundToCents,
   sortByDateDesc,
   totalsByCategory,
@@ -220,5 +222,94 @@ describe("sortByDateDesc", () => {
 describe("formatDate", () => {
   it("converte ISO para o formato brasileiro", () => {
     expect(formatDate("2026-08-31")).toBe("31/08/2026");
+  });
+});
+
+describe("expenseToInput", () => {
+  it("converte a despesa salva para o formato do formulário", () => {
+    expect(expenseToInput(despesa({ amount: 1234.5 }))).toEqual({
+      description: "Almoço",
+      amount: "1234,50",
+      category: "alimentacao",
+      date: "2026-08-10",
+    });
+  });
+
+  it("gera um input que passa na validação e volta à mesma despesa", () => {
+    const original = despesa({ amount: 19.99 });
+    const input = expenseToInput(original);
+
+    expect(isValid(validateExpense(input, HOJE))).toBe(true);
+    expect(createExpense(input, original.id)).toEqual(original);
+  });
+});
+
+describe("validação na edição (mesmas regras do cadastro)", () => {
+  const preenchido = expenseToInput(despesa());
+
+  it("rejeita descrição curta depois de editada", () => {
+    expect(validateExpense({ ...preenchido, description: "ab" }, HOJE).description).toMatch(
+      /pelo menos/,
+    );
+  });
+
+  it("rejeita valor zero ou negativo depois de editado", () => {
+    expect(validateExpense({ ...preenchido, amount: "0" }, HOJE).amount).toMatch(/maior que zero/);
+    expect(validateExpense({ ...preenchido, amount: "-5" }, HOJE).amount).toMatch(
+      /maior que zero/,
+    );
+  });
+
+  it("rejeita valor não numérico depois de editado", () => {
+    expect(validateExpense({ ...preenchido, amount: "abc" }, HOJE).amount).toMatch(
+      /valor numérico válido/,
+    );
+  });
+
+  it("rejeita categoria inválida depois de editada", () => {
+    expect(validateExpense({ ...preenchido, category: "xyz" }, HOJE).category).toBeDefined();
+  });
+
+  it("rejeita data no futuro depois de editada", () => {
+    expect(validateExpense({ ...preenchido, date: "2026-09-01" }, HOJE).date).toMatch(/futuro/);
+  });
+});
+
+describe("replaceExpense", () => {
+  const lista = [
+    despesa({ id: "1", date: "2026-08-20" }),
+    despesa({ id: "2", date: "2026-08-10" }),
+  ];
+
+  it("substitui a despesa mantendo o id e reordena por data", () => {
+    const resultado = replaceExpense(lista, "2", {
+      description: "Cinema",
+      amount: "50",
+      category: "lazer",
+      date: "2026-08-25",
+    });
+
+    expect(resultado).toEqual([
+      { id: "2", description: "Cinema", amount: 50, category: "lazer", date: "2026-08-25" },
+      lista[0],
+    ]);
+  });
+
+  it("não muta a lista original", () => {
+    replaceExpense(lista, "1", expenseToInput(despesa({ amount: 99 })));
+    expect(lista[0].amount).toBe(25);
+  });
+
+  it("devolve a lista sem alterações quando o id não existe", () => {
+    expect(replaceExpense(lista, "nao-existe", expenseToInput(despesa()))).toEqual(lista);
+  });
+
+  it("reflete a alteração no total", () => {
+    const antes = calculateTotal(lista);
+    const depois = calculateTotal(
+      replaceExpense(lista, "1", expenseToInput(despesa({ id: "1", amount: 100 }))),
+    );
+    expect(antes).toBe(50);
+    expect(depois).toBe(125);
   });
 });
