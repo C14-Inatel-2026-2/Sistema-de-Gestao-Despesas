@@ -13,6 +13,23 @@ let cachedRaw: string | null = null;
 let cachedExpenses: Expense[] = EMPTY;
 let mockApplied = false;
 
+function trySave(raw: string): boolean {
+  try {
+    window.localStorage.setItem(STORAGE_KEY, raw);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+function applyFirstVisitMock(): Expense[] {
+  mockApplied = true;
+  const mockRaw = JSON.stringify(MOCK_EXPENSES);
+  cachedRaw = trySave(mockRaw) ? mockRaw : null;
+  cachedExpenses = MOCK_EXPENSES;
+  return cachedExpenses;
+}
+
 export function readStore(): Expense[] {
   let raw: string | null = null;
   try {
@@ -21,20 +38,8 @@ export function readStore(): Expense[] {
     return EMPTY;
   }
 
-  // Primeira visita: grava o mock para as próximas leituras e recargas.
   if (raw === null && !mockApplied) {
-    mockApplied = true;
-    try {
-      const mockRaw = JSON.stringify(MOCK_EXPENSES);
-      window.localStorage.setItem(STORAGE_KEY, mockRaw);
-      cachedRaw = mockRaw;
-      cachedExpenses = MOCK_EXPENSES;
-      return cachedExpenses;
-    } catch {
-      cachedRaw = null;
-      cachedExpenses = MOCK_EXPENSES;
-      return cachedExpenses;
-    }
+    return applyFirstVisitMock();
   }
 
   if (raw !== cachedRaw) {
@@ -46,12 +51,8 @@ export function readStore(): Expense[] {
 
 export function writeStore(expenses: Expense[]) {
   cachedExpenses = expenses;
-  try {
-    cachedRaw = JSON.stringify(expenses);
-    window.localStorage.setItem(STORAGE_KEY, cachedRaw);
-  } catch {
-    // Sem persistência, o app continua funcionando em memória.
-  }
+  cachedRaw = JSON.stringify(expenses);
+  trySave(cachedRaw);
   for (const listener of listeners) listener();
 }
 
