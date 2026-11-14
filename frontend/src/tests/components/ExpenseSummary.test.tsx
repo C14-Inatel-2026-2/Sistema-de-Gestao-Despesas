@@ -58,6 +58,21 @@ describe("<ExpenseSummary />", () => {
     expect(screen.getByText(hasCurrency("10,00"))).toBeInTheDocument();
   });
 
+  it("mostra a média por despesa e o percentual de cada categoria", () => {
+    render(<ExpenseSummary expenses={expenses} />);
+
+    expect(screen.getByText("Média por despesa")).toBeInTheDocument();
+    expect(screen.getByText(hasCurrency("33,33"))).toBeInTheDocument();
+    expect(screen.getByText("90%")).toBeInTheDocument();
+    expect(screen.getByText("10%")).toBeInTheDocument();
+  });
+
+  it("mostra média zero quando a lista está vazia", () => {
+    render(<ExpenseSummary expenses={[]} />);
+
+    expect(screen.getAllByText(hasCurrency("0,00"))).toHaveLength(2);
+  });
+
   it("mostra total zero quando a lista está vazia", () => {
     render(<ExpenseSummary expenses={[]} />);
 
