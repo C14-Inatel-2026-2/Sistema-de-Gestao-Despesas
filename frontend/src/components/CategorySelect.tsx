@@ -7,7 +7,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { EXPENSE_CATEGORIES } from "@/types/expense";
+import { ALL_CATEGORIES, EXPENSE_CATEGORIES } from "@/types/expense";
 
 interface CategorySelectProps {
   id: string;
@@ -31,7 +31,7 @@ export function CategorySelect({
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
       <SelectContent>
-        {includeAll ? <SelectItem value="todas">Todas</SelectItem> : null}
+        {includeAll ? <SelectItem value={ALL_CATEGORIES}>Todas</SelectItem> : null}
         {EXPENSE_CATEGORIES.map((category) => (
           <SelectItem key={category.id} value={category.id}>
             {category.label}

@@ -377,6 +377,29 @@ Validação local antes e depois dos refactorings, com Python 3.12 e Node 22:
 
 As evidências de execução do pipeline Jenkins antes e depois estão registradas no [PR #48](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/48). A revisão segue o padrão da última entrega: **Marco Di Toro (`Frombull`)** e **Gabriel Gazotti (`GabrielGazotti`)**, com duas aprovações antes do merge. Esta seção documenta a contribuição de Paulo; cada integrante deve registrar pelo menos dois refactorings próprios.
 
+### Marco Di Toro
+
+Dois refactorings no frontend, registrados em commits separados no [PR #59](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/59) (issue #58, US14).
+
+| Smell | Refactoring aplicado | Por quê | PR |
+| --- | --- | --- | --- |
+| **Magic String / Duplicate Code:** o literal `"todas"` (filtro de categoria "sem filtro") estava repetido em `types/expense.ts`, `CategorySelect`, `ExpenseFiltersBar` e `filterExpenses`. | **Replace Magic String with Constant:** `ALL_CATEGORIES` em `types/expense.ts`, usada nos quatro lugares e no tipo de `ExpenseFilters`. | Um erro de digitação em um dos literais faria o filtro deixar de reconhecer "todas" sem nenhum erro de compilação. Com a constante, o valor tem um único ponto de definição e o TypeScript acusa o uso errado. | [#59](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/59) |
+| **Feature Envy / Long Function:** o componente `ExpenseSummary` calculava a média por despesa e o percentual de cada categoria dentro do JSX, misturando regra de cálculo com apresentação. | **Extract Function:** `calculateAverage` e `calculatePercent` em `lib/expenses.ts`, chamadas por `SummaryStats` e `CategoryBreakdown`. | A conta (inclusive a proteção contra divisão por zero) passa a ser pura e testável sem renderizar componente, junto das outras funções de cálculo (`calculateTotal`, `totalsByCategory`). | [#59](https://github.com/C14-Inatel-2026-2/Sistema-de-Gestao-Despesas/pull/59) |
+
+Os refactorings preservam o comportamento: a opção "Todas" continua emitindo o valor `todas`, a média continua sem arredondamento extra e o percentual continua sendo zero quando o total é zero. Antes de refatorar, três testes de caracterização foram adicionados (opção "Todas" do filtro, média e percentuais do resumo) e executados no código original; depois, os dois refactorings foram aplicados em commits separados e os mesmos testes continuaram aprovados. Quatro testes unitários das funções extraídas entraram em um commit à parte.
+
+Validação local antes e depois, com Node 26 (`--no-experimental-webstorage`) e Python 3.14:
+
+| Verificação | Antes | Depois |
+| --- | --- | --- |
+| Frontend — Vitest | 72 testes aprovados (69 existentes + 3 de caracterização) | os mesmos 72 aprovados; 76 com os testes das funções extraídas |
+| Frontend — cobertura | 88,08% de statements e 87,96% de linhas (69 testes) | 88,13% de statements e 88,01% de linhas (76 testes) |
+| ESLint e TypeScript | Aprovados | Aprovados |
+| Backend — Ruff e pytest | Aprovados; 28 testes, 100% de cobertura | Sem alteração no backend; mesmo resultado |
+| Cobertura mínima de 80% | Aprovada | Aprovada |
+
+O Jenkins local não foi executado para este PR; a validação acima roda os mesmos comandos dos jobs `qualidade`, `testes-frontend` e `cobertura-minima`.
+
 Prazo informado para a entrega e demais correções: **13/11/2026 às 23h59 (America/Bahia)**.
 
 ---
