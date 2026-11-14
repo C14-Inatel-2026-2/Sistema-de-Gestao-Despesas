@@ -1,4 +1,5 @@
 import {
+  ALL_CATEGORIES,
   isExpenseCategory,
   type Expense,
   type ExpenseCategory,
@@ -117,7 +118,7 @@ export function filterExpenses(
   filters: ExpenseFilters,
 ): Expense[] {
   return expenses.filter((expense) => {
-    if (filters.category !== "todas" && expense.category !== filters.category) {
+    if (filters.category !== ALL_CATEGORIES && expense.category !== filters.category) {
       return false;
     }
     if (filters.from && expense.date < filters.from) return false;
