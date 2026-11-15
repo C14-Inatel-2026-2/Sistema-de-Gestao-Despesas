@@ -2,7 +2,13 @@
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { categoryLabel, type Expense } from "@/types/expense";
-import { calculateTotal, formatCurrency, totalsByCategory } from "@/lib/expenses";
+import {
+  calculateAverage,
+  calculatePercent,
+  calculateTotal,
+  formatCurrency,
+  totalsByCategory,
+} from "@/lib/expenses";
 import { cn } from "@/lib/utils";
 
 interface ExpenseSummaryProps {
@@ -20,14 +26,11 @@ export function ExpenseSummary({ expenses, className }: ExpenseSummaryProps) {
 }
 
 export function SummaryStats({ expenses, className }: ExpenseSummaryProps) {
-  const total = calculateTotal(expenses);
-  const average = expenses.length > 0 ? total / expenses.length : 0;
-
   return (
     <div className={cn("grid gap-3 sm:grid-cols-3", className)}>
-      <Stat label="Total" value={formatCurrency(total)} highlight />
+      <Stat label="Total" value={formatCurrency(calculateTotal(expenses))} highlight />
       <Stat label="Despesas" value={String(expenses.length)} />
-      <Stat label="Média por despesa" value={formatCurrency(average)} />
+      <Stat label="Média por despesa" value={formatCurrency(calculateAverage(expenses))} />
     </div>
   );
 }
@@ -47,7 +50,7 @@ export function CategoryBreakdown({ expenses, className }: ExpenseSummaryProps) 
       <CardContent>
         <ul className="space-y-3">
           {byCategory.map(({ category, total: categoryTotal }) => {
-            const percent = total > 0 ? (categoryTotal / total) * 100 : 0;
+            const percent = calculatePercent(categoryTotal, total);
 
             return (
               <li key={category}>

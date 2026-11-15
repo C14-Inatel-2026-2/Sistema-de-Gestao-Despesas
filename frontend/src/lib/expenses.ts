@@ -1,4 +1,5 @@
 import {
+  ALL_CATEGORIES,
   isExpenseCategory,
   type Expense,
   type ExpenseCategory,
@@ -112,12 +113,22 @@ export function calculateTotal(expenses: readonly Expense[]): number {
   return roundToCents(expenses.reduce((total, expense) => total + expense.amount, 0));
 }
 
+/** Média por despesa; zero quando a lista está vazia. */
+export function calculateAverage(expenses: readonly Expense[]): number {
+  return expenses.length > 0 ? calculateTotal(expenses) / expenses.length : 0;
+}
+
+/** Quanto `part` representa de `total`, em porcentagem; zero quando o total é zero. */
+export function calculatePercent(part: number, total: number): number {
+  return total > 0 ? (part / total) * 100 : 0;
+}
+
 export function filterExpenses(
   expenses: readonly Expense[],
   filters: ExpenseFilters,
 ): Expense[] {
   return expenses.filter((expense) => {
-    if (filters.category !== "todas" && expense.category !== filters.category) {
+    if (filters.category !== ALL_CATEGORIES && expense.category !== filters.category) {
       return false;
     }
     if (filters.from && expense.date < filters.from) return false;

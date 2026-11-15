@@ -1,6 +1,8 @@
 import { describe, expect, it } from "vitest";
 import type { Expense } from "@/types/expense";
 import {
+  calculateAverage,
+  calculatePercent,
   calculateTotal,
   createExpense,
   filterExpenses,
@@ -143,6 +145,26 @@ describe("calculateTotal", () => {
 
   it("não acumula erro de ponto flutuante", () => {
     expect(calculateTotal([despesa({ amount: 0.1 }), despesa({ amount: 0.2 })])).toBe(0.3);
+  });
+});
+
+describe("calculateAverage", () => {
+  it("divide o total pela quantidade de despesas", () => {
+    expect(calculateAverage([despesa({ amount: 10 }), despesa({ amount: 30 })])).toBe(20);
+  });
+
+  it("retorna zero para uma lista vazia", () => {
+    expect(calculateAverage([])).toBe(0);
+  });
+});
+
+describe("calculatePercent", () => {
+  it("calcula a participação da parte no total", () => {
+    expect(calculatePercent(25, 100)).toBe(25);
+  });
+
+  it("retorna zero quando o total é zero", () => {
+    expect(calculatePercent(0, 0)).toBe(0);
   });
 });
 

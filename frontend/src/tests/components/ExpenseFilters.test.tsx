@@ -22,6 +22,22 @@ describe("<ExpenseFiltersBar />", () => {
     });
   });
 
+  it("emite 'todas' ao escolher a opção Todas", async () => {
+    const user = userEvent.setup();
+    const onChange = vi.fn();
+    render(
+      <ExpenseFiltersBar
+        filters={{ category: "saude", from: "", to: "" }}
+        onChange={onChange}
+      />,
+    );
+
+    await user.click(screen.getByRole("combobox", { name: /categoria/i }));
+    await user.click(await screen.findByRole("option", { name: "Todas" }));
+
+    expect(onChange).toHaveBeenCalledWith({ category: "todas", from: "", to: "" });
+  });
+
   it("desabilita Limpar quando não há filtros ativos", () => {
     render(<ExpenseFiltersBar filters={NO_FILTERS} onChange={vi.fn()} />);
 
