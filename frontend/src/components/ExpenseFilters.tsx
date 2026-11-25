@@ -5,7 +5,7 @@ import { CategorySelect } from "@/components/CategorySelect";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { EMPTY_FILTERS, type ExpenseFilters } from "@/types/expense";
+import { ALL_CATEGORIES, EMPTY_FILTERS, type ExpenseFilters } from "@/types/expense";
 
 interface ExpenseFiltersBarProps {
   filters: ExpenseFilters;
@@ -15,7 +15,7 @@ interface ExpenseFiltersBarProps {
 export function ExpenseFiltersBar({ filters, onChange }: ExpenseFiltersBarProps) {
   const fieldId = useId();
   const hasFilters =
-    filters.category !== "todas" || filters.from !== "" || filters.to !== "";
+    filters.category !== ALL_CATEGORIES || filters.from !== "" || filters.to !== "";
 
   return (
     <div className="grid grid-cols-2 gap-3 @lg:grid-cols-[1fr_1fr_1fr_auto] @lg:items-end">
