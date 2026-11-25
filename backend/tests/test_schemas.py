@@ -50,3 +50,24 @@ def test_despesa_create_rejeita_categoria_vazia():
 
     campos = [erro["loc"][0] for erro in exc_info.value.errors()]
     assert campos == ["categoria"]
+
+
+@pytest.mark.parametrize(
+    "campo, valor_invalido",
+    [("valor", 0), ("valor", -10), ("descricao", ""), ("categoria", ""), ("data", "nao-e-data")],
+)
+def test_despesa_update_aplica_as_mesmas_validacoes_do_cadastro(
+    campo: str, valor_invalido: object
+):
+    payload = {
+        "descricao": "Almoço",
+        "valor": 35.5,
+        "categoria": "Alimentação",
+        "data": date(2026, 9, 10),
+    }
+
+    with pytest.raises(ValidationError) as exc_info:
+        schemas.DespesaUpdate(**{**payload, campo: valor_invalido})
+
+    campos = [erro["loc"][0] for erro in exc_info.value.errors()]
+    assert campos == [campo]

@@ -20,10 +20,19 @@ function emptyForm(): ExpenseInput {
 
 interface ExpenseFormProps {
   onSubmit: (input: ExpenseInput) => void;
+  /**
+   * Dados atuais da despesa sendo editada. Quando informado, o formulário entra
+   * no modo de edição. Para trocar a despesa editada, remonte o componente com
+   * uma `key` diferente.
+   */
+  initialValues?: ExpenseInput;
+  /** Chamado ao cancelar a edição. */
+  onCancel?: () => void;
 }
 
-export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
-  const [form, setForm] = useState<ExpenseInput>(emptyForm);
+export function ExpenseForm({ onSubmit, initialValues, onCancel }: ExpenseFormProps) {
+  const isEditing = initialValues !== undefined;
+  const [form, setForm] = useState<ExpenseInput>(() => initialValues ?? emptyForm());
   const [errors, setErrors] = useState<ExpenseErrors>({});
   const fieldId = useId();
 
@@ -40,7 +49,7 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
     if (!isValid(validation)) return;
 
     onSubmit(form);
-    setForm(emptyForm());
+    if (!isEditing) setForm(emptyForm());
   }
 
   const ids = {
@@ -53,7 +62,7 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Nova despesa</CardTitle>
+        <CardTitle>{isEditing ? "Editar despesa" : "Nova despesa"}</CardTitle>
       </CardHeader>
 
       <CardContent>
@@ -70,6 +79,7 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
               onChange={(e) => update("description", e.target.value)}
               placeholder="Ex.: Supermercado do mês"
               aria-invalid={Boolean(errors.description)}
+              autoFocus={isEditing}
             />
           </Field>
 
@@ -109,8 +119,20 @@ export function ExpenseForm({ onSubmit }: ExpenseFormProps) {
           </Field>
 
           <Button type="submit" size="lg" className="mt-1 w-full sm:col-span-2">
-            Adicionar despesa
+            {isEditing ? "Salvar alterações" : "Adicionar despesa"}
           </Button>
+
+          {isEditing && onCancel ? (
+            <Button
+              type="button"
+              variant="outline"
+              size="lg"
+              onClick={onCancel}
+              className="w-full sm:col-span-2"
+            >
+              Cancelar edição
+            </Button>
+          ) : null}
         </form>
       </CardContent>
     </Card>
