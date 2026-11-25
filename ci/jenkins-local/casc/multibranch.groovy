@@ -17,6 +17,9 @@ multibranchPipelineJob('despesas-pipeline') {
             }
         }
     }
+    triggers {
+        periodicFolderTrigger { interval('1m') }
+    }
     factory {
         workflowBranchProjectFactory {
             scriptPath('Jenkinsfile')

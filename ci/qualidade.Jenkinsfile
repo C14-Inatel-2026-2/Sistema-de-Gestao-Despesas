@@ -19,6 +19,15 @@ pipeline {
         sh 'rm -rf frontend/reports frontend/coverage backend/reports backend/coverage'
       }
     }
+    stage('Testes da automação de deploy') {
+      steps {
+        sh '''#!/bin/sh
+set -eu
+docker run --rm -v "$PWD/ci:/ci:ro" -w /ci python:3.12-slim \
+  python -m unittest discover -s tests -v
+'''
+      }
+    }
     stage('qualidade') {
       steps {
         script {

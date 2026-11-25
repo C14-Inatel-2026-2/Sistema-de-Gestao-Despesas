@@ -5,7 +5,7 @@ services:
     build: .
     user: root
     ports:
-      - "127.0.0.1:8080:8080"
+      - "127.0.0.1:${JENKINS_PORT:-8080}:8080"
     environment:
       # O JENKINS_HOME precisa ter o mesmo caminho no host e no container:
       # os jobs fazem `docker run -v $PWD/...`, e quem resolve o caminho é o
